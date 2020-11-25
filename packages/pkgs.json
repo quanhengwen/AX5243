@@ -1,0 +1,27 @@
+[
+ {
+  "path": "/packages/tools/EasyFlash", 
+  "ver": "v4.1.0", 
+  "name": "EASYFLASH"
+ }, 
+ {
+  "path": "/packages/system/fal", 
+  "ver": "v0.5.0", 
+  "name": "FAL"
+ }, 
+ {
+  "path": "/packages/peripherals/button", 
+  "ver": "v1.0.1", 
+  "name": "BUTTON"
+ }, 
+ {
+  "path": "/packages/peripherals/agile_led", 
+  "ver": "latest", 
+  "name": "AGILE_LED"
+ }, 
+ {
+  "path": "/packages/peripherals/beep", 
+  "ver": "v1.1.0", 
+  "name": "BEEP"
+ }
+]
