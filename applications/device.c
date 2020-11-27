@@ -12,6 +12,7 @@
 #include "button.h"
 #include "device.h"
 #include "pin_config.h"
+#include "led.h"
 
 #define DBG_TAG "device"
 #define DBG_LVL DBG_LOG
@@ -22,6 +23,11 @@ rt_sem_t K0_Sem = RT_NULL;
 rt_sem_t K0_Long_Sem = RT_NULL;
 rt_sem_t K1_Sem = RT_NULL;
 rt_sem_t K1_Long_Sem = RT_NULL;
+
+uint16_t K0_Long_Sem_Counter=0;
+uint16_t K1_Long_Sem_Counter=0;
+uint8_t  K0_OnceFlag=0;
+uint8_t  K1_OnceFlag=0;
 void Key_Init(void)
 {
         K0_Sem=rt_sem_create("K0", 0, RT_IPC_FLAG_FIFO);
@@ -33,19 +39,61 @@ void Key_Init(void)
 }
 void K0_Sem_Release(void *parameter)
 {
-    rt_kprintf("K0 is Down\r\n");
+    rt_sem_release(K0_Sem);
+    key_down();
+    LOG_D("K0 is Down\r\n");
 }
 void K1_Sem_Release(void *parameter)
 {
-    rt_kprintf("K1 is Down\r\n");
+    rt_sem_release(K1_Sem);
+    key_down();
+    LOG_D("K1 is Down\r\n");
 }
 void K0_LongSem_Release(void *parameter)
 {
-    rt_kprintf("K0 is Long\r\n");
+    if(K0_OnceFlag==0)
+    {
+        if(K0_Long_Sem_Counter>6)
+        {
+            K0_OnceFlag=1;
+            key_down();
+            rt_sem_release(K0_Long_Sem);
+            rt_kprintf("K0 is Long\r\n");
+        }
+        else
+        {
+            LOG_D("K0 Long Counter is %d",K0_Long_Sem_Counter++);
+        }
+    }
 }
 void K1_LongSem_Release(void *parameter)
 {
-    rt_kprintf("K1 is Long\r\n");
+    if(K1_OnceFlag==0)
+    {
+        if(K1_Long_Sem_Counter>6)
+        {
+            K1_OnceFlag=1;
+            key_down();
+            rt_sem_release(K1_Long_Sem);
+            rt_kprintf("K1 is Long\r\n");
+        }
+        else
+        {
+            LOG_D("K1 Long Counter is %d",K1_Long_Sem_Counter++);
+        }
+    }
+}
+void K0_LongFree_Release(void *parameter)
+{
+    K0_OnceFlag=0;
+    K1_Long_Sem_Counter=0;
+    LOG_D("K0 is LongFree\r\n");
+}
+void K1_LongFree_Release(void *parameter)
+{
+    K1_OnceFlag=0;
+    K1_Long_Sem_Counter=0;
+    LOG_D("K1 is LongFree\r\n");
 }
 uint8_t Read_K0_Level(void)
 {
@@ -68,6 +116,8 @@ void button_task_entry(void *parameter)
         Button_Attach(&Key1,BUTTON_DOWM,K1_Sem_Release);
         Button_Attach(&Key0,BUTTON_LONG,K0_LongSem_Release);
         Button_Attach(&Key1,BUTTON_LONG,K1_LongSem_Release);
+        Button_Attach(&Key0,BUTTON_LONG_FREE,K0_LongFree_Release);
+        Button_Attach(&Key1,BUTTON_LONG_FREE,K1_LongFree_Release);
 
         while(1)
         {

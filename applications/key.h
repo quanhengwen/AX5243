@@ -9,7 +9,17 @@
  */
 #ifndef APPLICATIONS_KEY_H_
 #define APPLICATIONS_KEY_H_
+enum Device_Status
+{
+    Close=0,
+    Open,
+    SlaverLowPower,
+    SlaverWaterAlarmActive,
+    MasterLostPeak,
+    MasterWaterAlarmActive
+};
 
+void Key_Reponse(void);
 
 
 #endif /* APPLICATIONS_KEY_H_ */

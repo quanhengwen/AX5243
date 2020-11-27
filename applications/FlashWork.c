@@ -53,8 +53,19 @@ uint32_t Flash_Get_Key_Value(uint32_t key)
     read_value = atol(tempbuf);//转换数组为真实数据
     rt_free(tempbuf);//释放临时buffer对应内存空间
     rt_free(tempkey);//释放临时buffer对应内存空间
-    LOG_D("Reading value %ld ,len is %ld\r\n", read_value,len);//输出
+    LOG_D("Reading value %ld ,len is %ld\r\n",read_value,len);//输出
     return read_value;
+}
+uint8_t Flash_Get_Key_Valid(uint32_t key)
+{
+    char *tempkey = rt_malloc(10);//申请临时buffer空间
+    size_t len=0;//长度
+    sprintf(tempkey, "%ld", key);//将传入的数字转换成数组
+    ef_get_env_blob(tempkey, NULL, 0, &len);//获取长度
+    rt_free(tempkey);//释放临时buffer对应内存空间
+    LOG_D("Reading key %ld is %ld\r\n",key,len);//输出
+    if(len>0)return 1;
+    else return 0;
 }
 //void flash_test(uint32_t key)
 //{
@@ -91,7 +102,7 @@ void Flash_Key_Delete(uint32_t key)
 
 void D_test(void)
 {
-    Flash_Key_Change(12345678,665544);
+    Flash_Key_Delete(20022636);
 }
 MSH_CMD_EXPORT(D_test,D_test);
 void Z_test(void)
@@ -107,3 +118,12 @@ void F_test(void)
     }
 }
 MSH_CMD_EXPORT(F_test,F_test);
+void C_test(void)
+{
+    Flash_Key_Change(88888989,0);
+    Flash_Get_Key_Valid(11111111);
+    Flash_Get_Key_Valid(88888989);
+}
+MSH_CMD_EXPORT(C_test,C_test);
+
+

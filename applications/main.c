@@ -13,12 +13,12 @@
 #include "radio.h"
 #include "radio_config.h"
 #include "ax5043.h"
-#include "beep.h"
 #include "device.h"
 #include "led.h"
 #include "work.h"
 #include "fal.h"
 #include "easyflash.h"
+#include "key.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -51,10 +51,10 @@ int main(void)
     fal_init();
     easyflash_init();
     boot_time();
-    beep_user_Init();
     button_Init();
     led_Init();
     WaterScan_Init();
+    Key_Reponse();
     Radio_Task_Init();
     while (1)
     {

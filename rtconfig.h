@@ -219,11 +219,6 @@
 #define PKG_AGILE_LED_THREAD_STACK_SIZE 512
 #define PKG_AGILE_LED_THREAD_PRIORITY 20
 #define PKG_USING_AGILE_LED_LATEST_VERSION
-#define PKG_USING_BEEP
-#define PKG_BEEP_ACTIVE_BUZZER
-#define PKG_BEEP_USING_MSH_CMD
-#define PKG_BEEP_THREAD_STACK_USING_HEAP
-#define PKG_USING_BEEP_V110
 /* end of peripheral libraries and drivers */
 
 /* miscellaneous packages */

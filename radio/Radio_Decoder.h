@@ -11,5 +11,6 @@
 #define RADIO_RADIO_DECODER_H_
 
 void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len);
+void Start_Learn(void);
 
 #endif /* RADIO_RADIO_DECODER_H_ */

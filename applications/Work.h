@@ -13,5 +13,7 @@
 void Disable_Warining(void);
 void Enable_Warining(void);
 void WaterScan_Init(void);
+void WaterScan_Clear(void);
+
 
 #endif /* APPLICATIONS_WORK_H_ */

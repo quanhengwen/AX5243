@@ -22,8 +22,8 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
-//uint32_t Self_Id = 10010861;
-uint32_t Self_Id = 88998989;
+uint32_t Self_Id = 10010861;
+//uint32_t Self_Id = 88998989;
 uint32_t Self_Counter = 0;
 
 void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
@@ -34,7 +34,8 @@ void RadioSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t check = 0;
     uint8_t buf[35];
-
+    if(counter<255)counter++;
+    else counter=0;
 
     sprintf((char *)(buf),"{%08ld,%08ld,%03d,%02d,%d}",\
                                             Taget_Id,\

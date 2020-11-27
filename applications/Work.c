@@ -9,26 +9,31 @@
  */
 #include <rtthread.h>
 #include <rtdevice.h>
-#include "beep.h"
 #include "device.h"
 #include "led.h"
 #include "work.h"
 #include "pin_config.h"
-#include "beep.h"
 #include "led.h"
+#include "status.h"
+#include "moto.h"
+
 #define DBG_TAG "work"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+
 uint8_t WarningStatus=0;
+uint8_t WarningStatus_Temp=0;
 
 rt_thread_t WaterScan_t=RT_NULL;
 void Disable_Warining(void)
 {
+    BackToNormal();
     LOG_D("Warning is Close\r\n");
 }
 void Enable_Warining(void)
 {
+    SlaverWaterAlarmWarning();
     LOG_D("Warning is Open\r\n");
 }
 void WarningWithPeak(uint8_t status)
@@ -36,23 +41,29 @@ void WarningWithPeak(uint8_t status)
     switch(status)
     {
     case 0://恢复正常
-
+        //Moto_Open();
+        BackToNormal();
         break;
     case 1://测水线掉落
-        beep(2, 1500, 50, 0);
-        led_Slow_Start(0,2);
+        Moto_Close();
+        MasterLostPeakWarning();
         break;
     case 2://测水线短路
-        beep(3, 1500, 50, 0);
-        led_Slow_Start(0,3);
+        Moto_Close();
+        MasterWaterAlarmWarning();
         break;
     }
+}
+void WaterScan_Clear(void)
+{
+    WarningStatus=0;
+    WarningStatus_Temp=0;
 }
 void WaterScan_Callback(void *parameter)
 {
     uint8_t Peak_ON_Level=0;
     uint8_t Peak_Loss_Level=0;
-    uint8_t WarningStatus_Temp=0;
+
     LOG_D("WaterScan Init Success\r\n");
     rt_pin_mode(Peak_ON,PIN_MODE_INPUT);
     rt_pin_mode(Peak_Loss,PIN_MODE_INPUT);
@@ -76,10 +87,18 @@ void WaterScan_Callback(void *parameter)
         }
         if(WarningStatus_Temp!=WarningStatus)
         {
-            WarningStatus = WarningStatus_Temp;
-            LOG_D("Warning\r\n");
-            WarningWithPeak(WarningStatus);
-            //执行警报触发程序
+            if(WarningStatus_Temp==0&&WarningStatus==2)
+            {
+                WarningStatus = WarningStatus_Temp;
+                LOG_D("Warning But Not Reponse\r\n");
+            }
+            else
+            {
+                WarningStatus = WarningStatus_Temp;
+                LOG_D("Warning\r\n");
+                WarningWithPeak(WarningStatus);
+                //执行警报触发程序
+            }
         }
         rt_thread_mdelay(500);
     }
