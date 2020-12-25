@@ -206,7 +206,7 @@
 #define  REG_AX5043_BGNDRSSITHR            0x22F
 #define  REG_AX5043_PKTCHUNKSIZE           0x230
 #define  REG_AX5043_PKTMISCFLAGS           0x231  //03 03
-#define     REG_AX5043_PKTSTOREFLAGS       0x232
+#define  REG_AX5043_PKTSTOREFLAGS          0x232
 #define  REG_AX5043_PKTACCEPTFLAGS         0x233    //20 20
 
 #define REG_AX5043_GPADCCTRL  0x300
@@ -453,15 +453,15 @@
 #define AX5043_GPADCCTRL  0x00
 #define AX5043_GPADCPERIOD  0x3F
 
-#define AX5043_LPOSCCONFIG   0x00
-#define AX5043_LPOSCKFILT1   0x20
-#define AX5043_LPOSCKFILT0   0xC4
-#define AX5043_LPOSCREF1   0x61
-#define AX5043_LPOSCREF0   0xA8
-#define AX5043_LPOSCFREQ1   0x00
-#define AX5043_LPOSCFREQ0   0x00
-#define AX5043_LPOSCPER1   0x00
-#define AX5043_LPOSCPER0   0x00
+#define AX5043_LPOSCCONFIG      0x310
+#define AX5043_LPOSCKFILT1      0x312
+#define AX5043_LPOSCKFILT0      0x313
+#define AX5043_LPOSCREF1        0x314
+#define AX5043_LPOSCREF0        0x315
+#define AX5043_LPOSCFREQ1       0x316
+#define AX5043_LPOSCFREQ0       0x317
+#define AX5043_LPOSCPER1        0x318
+#define AX5043_LPOSCPER0        0x319
 
 #define AX5043_DACVALUE1                0x00
 #define AX5043_DACVALUE0                0x00
@@ -478,6 +478,9 @@
 #define AX5043_RSSIABSTHR               0xC6
 #define AX5043_BGNDRSSITHR              0x00
 #define AX5043_PKTCHUNKSIZE             0x0D
+#define AX5043_REG_TMGRXAGC             0x227
+#define AX5043_REG_TMGRXPREAMBLE1       0x229
+#define AX5043_REG_PKTMISCFLAGS         0x231
 //===========================================================
 
 //����TXģʽ��ֵ     16MHz  data Rate:10k
@@ -529,27 +532,27 @@
 // power states
 #define AX5043_PWRSTATE_POWERDOWN           0x0      //Powerdown; all circuits powered down
 #define AX5043_PWRSTATE_DEEPSLEEP           0x1      //Deep Sleep Mode; Chip is fully powered down until SEL is lowered again; looses all register contents
-#define AX5043_PWRSTATE_REGS_ON            0x4
-#define AX5043_PWRSTATE_XTAL_ON            0x5      //Crystal Oscillator enabled
-#define AX5043_PWRSTATE_FIFO_ON            0x7      //FIFO enabled
+#define AX5043_PWRSTATE_REGS_ON             0x4
+#define AX5043_PWRSTATE_XTAL_ON             0x5      //Crystal Oscillator enabled
+#define AX5043_PWRSTATE_FIFO_ON             0x7      //FIFO enabled
 #define AX5043_PWRSTATE_SYNTH_RX            0x8      //Synthesizer running, Receive Mode
 #define AX5043_PWRSTATE_FULL_RX             0x9      //Receiver Running
-#define AX5043_PWRSTATE_WOR_RX            0xb      //Receiver Wake-on-Radio Mode
+#define AX5043_PWRSTATE_WOR_RX              0xb      //Receiver Wake-on-Radio Mode
 #define AX5043_PWRSTATE_SYNTH_TX            0xc      //Synthesizer running, Transmit Mode
 #define AX5043_PWRSTATE_FULL_TX             0xd      //1101 Transmitter Running
 
 //fifo commands
-#define AX5043_FIFOCMD_NOP      0x00
-#define AX5043_FIFOCMD_DATA      0x01
-#define AX5043_FIFOCMD_REPEATDATA    0x02
-#define AX5043_FIFOCMD_TIMER     0x10
-#define AX5043_FIFOCMD_RSSI      0x11
-#define AX5043_FIFOCMD_FREQOFFS     0x12
-#define AX5043_FIFOCMD_RFFREQOFFS    0x13
-#define AX5043_FIFOCMD_DATARATE     0x14
-#define AX5043_FIFOCMD_ANTRSSI     0x15
-#define AX5043_FIFOCMD_TXCTRL     0x1C
-#define AX5043_FIFOCMD_TXPWR     0x1D
+#define AX5043_FIFOCMD_NOP                  0x00
+#define AX5043_FIFOCMD_DATA                 0x01
+#define AX5043_FIFOCMD_REPEATDATA           0x02
+#define AX5043_FIFOCMD_TIMER                0x10
+#define AX5043_FIFOCMD_RSSI                 0x11
+#define AX5043_FIFOCMD_FREQOFFS             0x12
+#define AX5043_FIFOCMD_RFFREQOFFS           0x13
+#define AX5043_FIFOCMD_DATARATE             0x14
+#define AX5043_FIFOCMD_ANTRSSI              0x15
+#define AX5043_FIFOCMD_TXCTRL               0x1C
+#define AX5043_FIFOCMD_TXPWR                0x1D
 
 // RF ����״̬
 // typedefs
@@ -597,13 +600,13 @@
 
 // additional AX5043 registers & definitions
 
-#define REG_AX5043_0xF01            0x4f01
-#define REG_AX5043_0xF0C              0x4f0c
-#define REG_AX5043_0xF2F              0x4f2f
-#define REG_AX5043_0xF30              0x4f30
-#define REG_AX5043_0xF31              0x4f31
-#define REG_AX5043_0xF32              0x4f32
-#define REG_AX5043_0xF33             0x4f33
+#define REG_AX5043_0xF01            0xf01
+#define REG_AX5043_0xF0C              0xf0c
+#define REG_AX5043_0xF2F              0xf2f
+#define REG_AX5043_0xF30              0xf30
+#define REG_AX5043_0xF31              0xf31
+#define REG_AX5043_0xF32              0xf32
+#define REG_AX5043_0xF33             0xf33
 
 #define REG_AX5043_LPOSCCONFIG      0x310
 #define REG_AX5043_LPOSCSTATUS      0x311
@@ -615,6 +618,8 @@
 #define REG_AX5043_LPOSCFREQ0       0x317
 #define REG_AX5043_LPOSCPER1        0x318
 #define REG_AX5043_LPOSCPER0        0x319
+
+
 
 
 /*********************************the end of file***********************/

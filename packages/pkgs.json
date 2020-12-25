@@ -18,10 +18,5 @@
   "path": "/packages/peripherals/agile_led", 
   "ver": "latest", 
   "name": "AGILE_LED"
- }, 
- {
-  "path": "/packages/peripherals/beep", 
-  "ver": "v1.1.0", 
-  "name": "BEEP"
  }
 ]

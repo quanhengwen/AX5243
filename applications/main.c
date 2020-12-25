@@ -19,6 +19,7 @@
 #include "fal.h"
 #include "easyflash.h"
 #include "key.h"
+#include "wifi-uart.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -53,9 +54,10 @@ int main(void)
     boot_time();
     button_Init();
     led_Init();
-    WaterScan_Init();
+    //WaterScan_Init();
     Key_Reponse();
-    Radio_Task_Init();
+    WifiEnable();
+    //Radio_Task_Init();
     while (1)
     {
         rt_thread_mdelay(1000);

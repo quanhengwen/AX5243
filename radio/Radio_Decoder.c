@@ -96,7 +96,7 @@ void Device_Learn(Message buf)
         }
         break;
     case 3:
-        Learn_Flag = 1;
+        Learn_Flag = 0;
         Start_Learn();
         RadioSend(buf.From_ID,buf.Counter,3,3);
         break;
