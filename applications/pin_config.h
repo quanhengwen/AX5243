@@ -26,6 +26,8 @@
 #define Peak_Loss               37
 #define Turn1                   16
 #define Turn2                   17
+#define Senor1                  36
+#define Senor2                  37
 #define Moto                    1
 //WIFI
 #define WIFIEN                  15

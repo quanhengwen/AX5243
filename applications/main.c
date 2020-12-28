@@ -54,10 +54,10 @@ int main(void)
     boot_time();
     button_Init();
     led_Init();
-    //WaterScan_Init();
+    WaterScan_Init();
     Key_Reponse();
     WifiEnable();
-    //Radio_Task_Init();
+    Radio_Task_Init();
     while (1)
     {
         rt_thread_mdelay(1000);

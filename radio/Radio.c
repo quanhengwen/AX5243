@@ -1108,11 +1108,13 @@ void transmit_packet_task(uint8_t *Buf, uint8_t u8Len)
     SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK0, 0x00);     //AX5043_IRQMASK0 = 0x00;
     SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK1, 0x01);     //AX5043_IRQMASK1 = 0x01; // enable xtal ready interrupt
 }
+extern void radio_test(void);
 void radio_send(void)
 {
     axradio_txbuffer_cnt = 160;
-    uint8_t buf[]={1,2,3,4,5,6,7,8,9,0};
-    transmit_packet_task(buf,sizeof(buf));
+    radio_test();
+//    uint8_t buf[]={1,2,3,4,5,6,7,8,9,0};
+//    transmit_packet_task(buf,sizeof(buf));
 }
 MSH_CMD_EXPORT(radio_send,radio_send);
 void radio_send1(void)
@@ -1249,8 +1251,10 @@ static void TransmitData(void)
 void send_t_callback(void *parameter)
 {
     axradio_txbuffer_cnt = 112;
-    uint8_t buf[]={1,2,3,4,5,6,7,8,9,0};
-    transmit_packet_task(buf,sizeof(buf));
+//    uint8_t buf[]={1,2,3,4,5,6,7,8,9,0};
+//    transmit_packet_task(buf,sizeof(buf));
+    RadioSend(10010861,0,5,0);
+
 }
 void send_start(void)
 {
@@ -1289,6 +1293,7 @@ void Radio_Task_Callback(void *parameter)
             switch (ubRFState)
                     {
                         case trxstate_rx: //0x01
+                            LOG_D("Got Data");
                             ReceiveData();
                             SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK0,0x01);
                             AX5043ReceiverON();

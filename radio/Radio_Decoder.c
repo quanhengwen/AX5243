@@ -48,7 +48,7 @@ uint8_t Learn_Flag=0;;
 
 uint8_t Check_Valid(uint32_t From_id)
 {
-    if(Flash_Get_Key_Valid(From_id)!=1)return 0;
+    if(Flash_Get_Key_Valid(From_id)==1)return 0;
     else return 1;
 }
 void Start_Learn(void)
@@ -73,10 +73,10 @@ void Device_Learn(Message buf)
     switch(buf.Data)
     {
     case 1:
-        if(Flash_Get_Key_Valid(buf.From_ID)!=1)//如果数据库不存在该值
+        if(Check_Valid(buf.From_ID)!=1)//如果数据库不存在该值
         {
             LOG_D("Not Include This Device，Write to Flash\r\n");
-            Flash_Key_Change(buf.From_ID,0);//向数据库写入
+            Add_Device(buf.From_ID);//向数据库写入
         }
         else//存在该值
         {
@@ -85,7 +85,7 @@ void Device_Learn(Message buf)
         RadioSend(buf.From_ID,buf.Counter,3,1);
         break;
     case 2:
-        if(Flash_Get_Key_Valid(buf.From_ID)!=1)//如果数据库不存在该值
+        if(Check_Valid(buf.From_ID)!=1)//如果数据库不存在该值
         {
             LOG_D("Ack Not Include This Device\r\n");
         }

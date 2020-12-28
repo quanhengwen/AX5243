@@ -27,7 +27,9 @@ void test_moto(void)//打开turn1高，关闭turn0高
     {
         rt_kprintf("Turn1 is %d\r\n",rt_pin_read(Turn1));
         rt_kprintf("Turn2 is %d\r\n",rt_pin_read(Turn2));
-        rt_thread_mdelay(500);
+        rt_kprintf("Senor1 is %d\r\n",rt_pin_read(Turn1));
+        rt_kprintf("Senor2 is %d\r\n",rt_pin_read(Turn2));
+        rt_thread_mdelay(1000);
     }
 }
 MSH_CMD_EXPORT(test_moto,test_moto);
@@ -47,4 +49,8 @@ void Moto_Close(void)
     rt_pin_mode(Moto,0);
     rt_pin_write(Moto,0);
 }
-
+//void Moto_Detect(void)
+//{
+//    uint8_t PastMode = ValveStatus;
+//    if(ValveStatus)
+//}
