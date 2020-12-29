@@ -84,22 +84,22 @@ void Key_Reponse_Callback(void *parameter)
                 break;
             case SlaverLowPower:
                 Now_Status = Close;
-                beep_stop();//蜂鸣器停止
+                Disable_Warining();//消警
                 LOG_D("SlaverLowPower With OFF\r\n");
                 break;
             case SlaverWaterAlarmActive:
                 Now_Status = Close;
-                beep_stop();//蜂鸣器停止
+                Disable_Warining();//消警
                 LOG_D("SlaverWaterAlarmActive With OFF\r\n");
                 break;
             case MasterLostPeak:
                 Now_Status = Close;
-                beep_stop();//蜂鸣器停止
+                Disable_Warining();//消警
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:
                 Now_Status = Close;
-                beep_stop();//蜂鸣器停止
+                Disable_Warining();//消警
                 LOG_D("MasterWaterAlarmActive With OFF\r\n");
                 break;
             }

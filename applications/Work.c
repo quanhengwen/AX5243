@@ -16,6 +16,7 @@
 #include "led.h"
 #include "status.h"
 #include "moto.h"
+#include "Flashwork.h"
 
 #define DBG_TAG "work"
 #define DBG_LVL DBG_LOG
@@ -24,8 +25,8 @@
 
 uint8_t WarningStatus=0;
 uint8_t WarningStatus_Temp=0;
-
 rt_thread_t WaterScan_t=RT_NULL;
+
 void Disable_Warining(void)
 {
     BackToNormal();
@@ -107,4 +108,12 @@ void WaterScan_Init(void)
 {
     WaterScan_t = rt_thread_create("WaterScan", WaterScan_Callback, RT_NULL, 1004, 30, 5);
     //if(WaterScan_t!=RT_NULL)rt_thread_startup(WaterScan_t);
+}
+void AliveIncrease(void)//心跳使counter增加
+{
+    Update_All_Time();
+}
+void AliveDetect(void)//counter检测
+{
+    Update_All_Time();
 }

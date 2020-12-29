@@ -122,8 +122,8 @@ void DataSolve(Message buf)
             else
             {
                 RadioSend(buf.From_ID,buf.Counter,2,0);//正常握手
-                BackToNormal();
-                Moto_Open();
+                Disable_Warining();
+                //Moto_Open();
             }
             LOG_D("Handshake With %ld\r\n",buf.From_ID);
         }
@@ -136,6 +136,7 @@ void DataSolve(Message buf)
         if(Learn_Flag||buf.Data==3)
         {
             LOG_D("Learn\r\n");
+            Disable_Warining();
             Device_Learn(buf);
         }
         else
@@ -161,6 +162,7 @@ void DataSolve(Message buf)
         if(Check_Valid(buf.From_ID))
         {
             LOG_D("Pwr On From %ld\r\n",buf.From_ID);
+            Disable_Warining();
             Moto_Open();
             RadioSend(buf.From_ID,buf.Counter,5,0);
         }
@@ -192,6 +194,7 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
     if(rx_buffer[rx_len-1]==0x0A&&rx_buffer[rx_len-2]==0x0D)
     {
         LOG_D("Rx verify ok\r\n");
+        Clear_Device_Time(Rx_message.From_ID);
         rx_buffer[rx_len-1]=0;
         rx_buffer[rx_len-2]=0;
         sscanf((const char *)&rx_buffer[1],"{%ld,%ld,%d,%d,%d}",&Rx_message.Target_ID,&Rx_message.From_ID,&Rx_message.Counter,&Rx_message.Command,&Rx_message.Data);

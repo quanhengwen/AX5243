@@ -12,13 +12,10 @@
 #include "pin_config.h"
 #include "wifi-uart.h"
 #include "ulog.h"
-void WifiEnable(void)
-{
-    rt_pin_mode(WIFIEN,PIN_MODE_OUTPUT);
-    rt_pin_write(15,0);
-}
 
-#define WiFi_UART_NAME                   "uart1"
+#define DBG_TAG "wifi"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
 
 /* 用于接收消息的信号量 */
 static struct rt_semaphore rx_sem;
@@ -26,6 +23,13 @@ static rt_device_t serial;
 static rt_thread_t WiFi_Thread = RT_NULL;
 struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
 
+#define WiFi_UART_NAME                   "uart1"
+
+void WifiEnable(void)
+{
+    rt_pin_mode(WIFIEN,PIN_MODE_OUTPUT);
+    rt_pin_write(15,0);
+}
 /* 接收数据回调函数 */
 static rt_err_t uart_rx_ind(rt_device_t dev, rt_size_t size)
 {
@@ -48,13 +52,10 @@ static char uart_sample_get_char(void)
     }
     return ch;
 }
-
 /* 数据解析线程 */
 void data_parsing(void)
 {
     char ch;
-    char test=0xEE;
-    //Tds_Init();
     LOG_D("WiFi Thread Init Success\r\n");
 
     while (1)
