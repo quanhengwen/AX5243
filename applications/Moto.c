@@ -11,6 +11,7 @@
 #include "rtdevice.h"
 #include "pin_config.h"
 #include "led.h"
+#include "moto.h"
 
 #define DBG_TAG "moto"
 #define DBG_LVL DBG_LOG
@@ -38,25 +39,33 @@ void Moto_Close(void)
 }
 void Turn1_Edge_Callback(void *parameter)
 {
+    LOG_D("Turn1_Edge_Callback\r\n");
     Turn1_Flag = 1;
 }
 void Turn2_Edge_Callback(void *parameter)
 {
+    LOG_D("Turn2_Edge_Callback\r\n");
     Turn2_Flag = 1;
 }
 void Turn1_Timer_Callback(void *parameter)
 {
     Moto_Open();
-    if(Turn1_Flag)
+    rt_pin_irq_enable(Turn1, PIN_IRQ_DISABLE);
+    if(!Turn1_Flag)
     {
+        LOG_D("Moto1 is Fail\r\n");
+        beep_start(0,4);
         //上报
     }
 }
 void Turn2_Timer_Callback(void *parameter)
 {
     Moto_Open();
-    if(Turn2_Flag)
+    rt_pin_irq_enable(Turn2, PIN_IRQ_DISABLE);
+    if(!Turn2_Flag)
     {
+        LOG_D("Moto2 is Fail\r\n");
+        beep_start(0,4);
         //上报
     }
 }
@@ -66,29 +75,31 @@ void Moto_Init(void)
     rt_pin_mode(Turn2,PIN_MODE_INPUT);
     rt_pin_attach_irq(Turn1, PIN_IRQ_MODE_FALLING, Turn1_Edge_Callback, RT_NULL);
     rt_pin_attach_irq(Turn2, PIN_IRQ_MODE_FALLING, Turn2_Edge_Callback, RT_NULL);
-    rt_pin_irq_enable(Turn1, PIN_IRQ_ENABLE);
-    rt_pin_irq_enable(Turn2, PIN_IRQ_ENABLE);
     LOG_D("Moto is Init\r\n");
-    Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
+    Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5100, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     Moto_Timer2 = rt_timer_create("Moto_Timer2", Turn2_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
 }
 
-
+MSH_CMD_EXPORT(Moto_Init,Moto_Init);
 void Moto_Detect(void)
 {
-    if(Turn1==1&&ValveStatus==1)
+    uint8_t ValveFuncFlag = ValveStatus;
+    if(rt_pin_read(Turn1)==1&&ValveFuncFlag==1)
     {
         Turn1_Flag = 0;
+        rt_pin_irq_enable(Turn1, PIN_IRQ_ENABLE);
         Moto_Close();
         rt_timer_start(Moto_Timer1);
     }
-    if(Turn2&&ValveStatus==1)
+    if(rt_pin_read(Turn2)==1&&ValveFuncFlag==1)
     {
-        Turn1_Flag = 0;
+        Turn2_Flag = 0;
+        rt_pin_irq_enable(Turn2, PIN_IRQ_ENABLE);
         Moto_Close();
         rt_timer_start(Moto_Timer2);
     }
 }
+MSH_CMD_EXPORT(Moto_Detect,Moto_Detect);
 void test_moto(void)//打开turn1高，关闭turn0高
 {
     rt_pin_mode(Moto,0);

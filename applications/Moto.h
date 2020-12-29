@@ -12,7 +12,8 @@
 
 void Moto_Open(void);
 void Moto_Close(void);
-
+void Moto_Init(void);
+void Moto_Detect(void);
 
 
 #endif /* APPLICATIONS_MOTO_H_ */

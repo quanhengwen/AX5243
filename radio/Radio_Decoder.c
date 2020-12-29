@@ -194,10 +194,10 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
     if(rx_buffer[rx_len-1]==0x0A&&rx_buffer[rx_len-2]==0x0D)
     {
         LOG_D("Rx verify ok\r\n");
-        Clear_Device_Time(Rx_message.From_ID);
         rx_buffer[rx_len-1]=0;
         rx_buffer[rx_len-2]=0;
         sscanf((const char *)&rx_buffer[1],"{%ld,%ld,%d,%d,%d}",&Rx_message.Target_ID,&Rx_message.From_ID,&Rx_message.Counter,&Rx_message.Command,&Rx_message.Data);
+        Clear_Device_Time(Rx_message.From_ID);
         if(Rx_message.Target_ID==Self_Id ||Rx_message.Target_ID==99999999)DataSolve(Rx_message);
     }
 }

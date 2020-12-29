@@ -4,6 +4,7 @@
 #include "pin_config.h"
 #include "RTCWork.h"
 #include "Flashwork.h"
+#include "moto.h"
 
 rt_timer_t RTC_Timer=RT_NULL;
 rt_thread_t RTC_Task=RT_NULL;
@@ -21,14 +22,20 @@ uint8_t RTC_Event_Flag = 0;
 uint8_t RTC_Counter=0;
 void RTC_Timer_Entry(void)
 {
-    LOG_D("RTC Handler Callback\r\n");
+    LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
+    if(RTC_Counter==4)
+    {
+        Moto_Detect();
+    }
     if(RTC_Counter<24)
     {
+        LOG_D("RTC Handler Increase\r\n");
         Update_All_Time();//24小时更新全部时间
         RTC_Counter++;
     }
     else
     {
+        LOG_D("RTC Handler Detect\r\n");
         Detect_All_Time();//25个小时检测计数器
         RTC_Counter=0;
     }
@@ -87,7 +94,7 @@ void RTC_AlarmConfig(void)
     salarmstructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
     salarmstructure.AlarmTime.Hours = 0;
     salarmstructure.AlarmTime.Minutes = 0;
-    salarmstructure.AlarmTime.Seconds = 10;
+    salarmstructure.AlarmTime.Seconds = 1;
     salarmstructure.AlarmTime.SubSeconds = 0;
 
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BIN) == HAL_OK)

@@ -18,6 +18,7 @@
 #include "work.h"
 #include "fal.h"
 #include "easyflash.h"
+#include "flashwork.h"
 #include "key.h"
 #include "wifi-uart.h"
 
@@ -35,7 +36,9 @@ int main(void)
     WaterScan_Init();
     Key_Reponse();
     WifiEnable();
+    LoadDevice2Memory();
     Radio_Task_Init();
+    Moto_Init();
     while (1)
     {
         rt_thread_mdelay(1000);

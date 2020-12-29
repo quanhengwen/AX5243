@@ -2,6 +2,7 @@
 #include "rtdevice.h"
 #include "pin_config.h"
 #include "FlashWork.h"
+#include "led.h"
 #include <easyflash.h>
 #include <fal.h>
 #include <stdlib.h>
@@ -135,7 +136,8 @@ uint8_t Delete_Device(uint32_t Device_ID)
 uint8_t Update_Device_Time(uint32_t Device_ID,uint32_t TimeCount)//更新时间戳
 {
     uint16_t num = Global_Device.Num;
-    do
+    if(!num)return RT_ERROR;
+    while(num)
     {
         if(Global_Device.ID[num]==Device_ID)
         {
@@ -143,15 +145,17 @@ uint8_t Update_Device_Time(uint32_t Device_ID,uint32_t TimeCount)//更新时间�
             LOG_D("Device %d is Increase to %d",Global_Device.ID[num],TimeCount);
             return RT_EOK;
         }
+        num--;
     }
-    while(num--);
     LOG_D("Device %d is Not Increase Success",Global_Device.ID[num]);
     return RT_ERROR;
 }
 uint8_t Clear_Device_Time(uint32_t Device_ID)//更新时间戳为0
 {
     uint16_t num = Global_Device.Num;
-    do
+    LOG_D("Clear_Device_Time Num is %d\r\n",num);
+    if(!num)return RT_ERROR;
+    while(num)
     {
         if(Global_Device.ID[num]==Device_ID)
         {
@@ -159,51 +163,61 @@ uint8_t Clear_Device_Time(uint32_t Device_ID)//更新时间戳为0
             LOG_D("Device %d is Clear to 0",Global_Device.ID[num]);
             return RT_EOK;
         }
+        num--;
     }
-    while(num--);
-    LOG_D("Device %d is Not Clear Success",Global_Device.ID[num]);
+    LOG_D("Device %d is Not Found\r\n",Device_ID);
     return RT_ERROR;
 }
 void Update_All_Time(void)
 {
     uint16_t Num = Global_Device.Num;
+    if(!Num)return;
     uint32_t Time = 0;
     for(uint8_t i=0;i<=Num;i++)
     {
         Time = Global_Device.ID_Time[i];//查询剩余时间
         Time++;                         //自增
         Global_Device.ID_Time[i] = Time;//更新内存中的时间
+        LOG_D("Device ID %ld With Time is Update to %d\r\n",Global_Device.ID[i],Global_Device.ID_Time[i]);
     }
+    LOG_D("Update_All_Time OK\r\n");
 }
 void Clear_All_Time(void)
 {
     uint16_t Num = Global_Device.Num;
+    if(!Num)return;
     for(uint8_t i=0;i<=Num;i++)
     {
         Global_Device.ID_Time[i] = 0;//更新内存中的时间
     }
+    LOG_D("Clear_All_Time OK\r\n");
 }
 void Detect_All_Time(void)
 {
     uint16_t num = Global_Device.Num;
-    do
+    if(!num)return;
+    while(num)
     {
         if(Global_Device.ID_Time[num]>=24)
         {
             //掉线ID上报
+            beep_start(0,5);
+            LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
         }
+        num--;
     }
-    while(num--);
     Clear_All_Time();
+    LOG_D("Detect_All_Time OK\r\n");
 }
 uint8_t Flash_Get_Key_Valid(uint32_t Device_ID)//查询内存中的ID
 {
     uint16_t num = Global_Device.Num;
-    do
+    if(!num)return RT_ERROR;
+    while(num)
     {
         if(Global_Device.ID[num]==Device_ID)return RT_EOK;
+        num--;
     }
-    while(num--);
     return RT_ERROR;
 }
 void LoadDevice2Memory(void)//数据载入到内存中
@@ -218,11 +232,3 @@ void LoadDevice2Memory(void)//数据载入到内存中
     }
 }
 MSH_CMD_EXPORT(LoadDevice2Memory,LoadDevice2Memory);
-void test11(void)
-{
-    Add_Device(11111110);
-    Add_Device(11111111);
-    Add_Device(11111112);
-    Add_Device(11111113);
-}
-MSH_CMD_EXPORT(test11,test11);

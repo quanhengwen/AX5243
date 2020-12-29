@@ -25,7 +25,9 @@
 
 uint8_t WarningStatus=0;
 uint8_t WarningStatus_Temp=0;
+uint8_t ValvePastStatus=0;
 rt_thread_t WaterScan_t=RT_NULL;
+extern uint8_t ValveStatus;
 
 void Disable_Warining(void)
 {
@@ -42,10 +44,11 @@ void WarningWithPeak(uint8_t status)
     switch(status)
     {
     case 0://恢复正常
-        //Moto_Open();
+        if(ValvePastStatus)Moto_Open();else Moto_Close();
         BackToNormal();
         break;
     case 1://测水线掉落
+        ValvePastStatus = ValveStatus;
         Moto_Close();
         MasterLostPeakWarning();
         break;
@@ -107,7 +110,7 @@ void WaterScan_Callback(void *parameter)
 void WaterScan_Init(void)
 {
     WaterScan_t = rt_thread_create("WaterScan", WaterScan_Callback, RT_NULL, 1004, 30, 5);
-    //if(WaterScan_t!=RT_NULL)rt_thread_startup(WaterScan_t);
+    if(WaterScan_t!=RT_NULL)rt_thread_startup(WaterScan_t);
 }
 void AliveIncrease(void)//心跳使counter增加
 {

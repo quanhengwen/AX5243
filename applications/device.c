@@ -40,13 +40,13 @@ void Key_Init(void)
 void K0_Sem_Release(void *parameter)
 {
     rt_sem_release(K0_Sem);
-    key_down();
+    //key_down();
     LOG_D("K0 is Down\r\n");
 }
 void K1_Sem_Release(void *parameter)
 {
     rt_sem_release(K1_Sem);
-    key_down();
+    //key_down();
     LOG_D("K1 is Down\r\n");
 }
 void K0_LongSem_Release(void *parameter)

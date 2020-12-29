@@ -13,6 +13,7 @@
 #include "led.h"
 #include "moto.h"
 #include "Radio_Decoder.h"
+#include "work.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -49,22 +50,29 @@ void Key_Reponse_Callback(void *parameter)
             switch(Now_Status)
             {
             case Close:
+                key_down();
                 Now_Status = Open;
                 Moto_Open();
                 LOG_D("Valve Open With ON\r\n");
                 break;
             case Open:
+                key_down();
                 LOG_D("Valve Already Open With ON\r\n");
                 break;
             case SlaverLowPower:
                 break;
             case SlaverWaterAlarmActive:
+                key_down();
                 Now_Status = Open;
                 Moto_Open();
                 beep_start(0,2);//蜂鸣器三下
                 LOG_D("SlaverWaterAlarmActive With ON\r\n");
                 break;
             case MasterLostPeak:
+                key_down();
+                Now_Status = Open;
+                Moto_Open();
+                LOG_D("MasterLostPeak With ON\r\n");
                 break;
             case MasterWaterAlarmActive:
                 break;
@@ -75,29 +83,35 @@ void Key_Reponse_Callback(void *parameter)
             switch(Now_Status)
             {
             case Close:
+                key_down();
                 LOG_D("Valve Already Close With OFF\r\n");
                 break;
             case Open:
+                key_down();
                 Now_Status = Close;
                 Moto_Close();
                 LOG_D("Valve Close With OFF\r\n");
                 break;
             case SlaverLowPower:
+                key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
                 LOG_D("SlaverLowPower With OFF\r\n");
                 break;
             case SlaverWaterAlarmActive:
+                key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
                 LOG_D("SlaverWaterAlarmActive With OFF\r\n");
                 break;
             case MasterLostPeak:
+                key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:
+                key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
                 LOG_D("MasterWaterAlarmActive With OFF\r\n");
