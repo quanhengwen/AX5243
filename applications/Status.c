@@ -48,12 +48,27 @@ void MasterLostPeakWarning(void)
 MSH_CMD_EXPORT(MasterLostPeakWarning,MasterLostPeakWarning);
 void MasterWaterAlarmWarning(void)
 {
-    Moto_Close();
     beep_start(0,2);//红灯,蜂鸣器三下
+    Moto_Close();
     Now_Status = MasterWaterAlarmActive;
     LOG_D("MasterWaterAlarmWarning\r\n");
 }
 MSH_CMD_EXPORT(MasterWaterAlarmWarning,MasterWaterAlarmWarning);
+void OfflineWarning(void)
+{
+    if(Now_Status!=Offline)
+    {
+        Moto_Close();
+        beep_start(0,5);
+        Now_Status = Offline;
+        LOG_D("OfflineWarning\r\n");
+    }
+    else
+    {
+        LOG_D("Already OfflineWarning Now\r\n");
+    }
+
+}
 void BackToNormal(void)
 {
     WaterScan_Clear();
@@ -62,11 +77,11 @@ void BackToNormal(void)
     led_Stop(1);
     if(ValveStatus)
     {
-        Now_Status = Open;
+        Moto_Open();
     }
     else
     {
-        Now_Status = Close;
+        Moto_Close();
     }
 }
 

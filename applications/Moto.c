@@ -11,6 +11,7 @@
 #include "rtdevice.h"
 #include "pin_config.h"
 #include "led.h"
+#include "key.h"
 #include "moto.h"
 
 #define DBG_TAG "moto"
@@ -20,10 +21,11 @@
 rt_timer_t Moto_Timer1,Moto_Timer2 = RT_NULL;
 uint8_t Turn1_Flag,Turn2_Flag = 0;
 extern uint8_t ValveStatus;
-
+extern enum Device_Status Now_Status;
 void Moto_Open(void)
 {
     LOG_D("Moto is Open\r\n");
+    Now_Status = Open;
     led_Long_Start(1);//绿灯
     ValveStatus=1;
     rt_pin_mode(Moto,0);
@@ -32,6 +34,7 @@ void Moto_Open(void)
 void Moto_Close(void)
 {
     LOG_D("Moto is Close\r\n");
+    Now_Status = Close;
     led_Stop(1);//绿灯
     ValveStatus=0;
     rt_pin_mode(Moto,0);
@@ -78,6 +81,8 @@ void Moto_Init(void)
     LOG_D("Moto is Init\r\n");
     Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5100, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     Moto_Timer2 = rt_timer_create("Moto_Timer2", Turn2_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
+    just_ring();
+    Moto_Open();
 }
 
 MSH_CMD_EXPORT(Moto_Init,Moto_Init);

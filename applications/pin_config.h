@@ -18,8 +18,8 @@
 #define SCK                     39
 #define CS                      40
 //BASIC
-#define K0                      33
-#define K1                      35
+#define K0                      35
+#define K1                      33
 #define LED0_PIN                32
 #define LED1_PIN                34
 #define Peak_ON                 36

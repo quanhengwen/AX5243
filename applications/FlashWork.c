@@ -2,6 +2,7 @@
 #include "rtdevice.h"
 #include "pin_config.h"
 #include "FlashWork.h"
+#include "status.h"
 #include "led.h"
 #include <easyflash.h>
 #include <fal.h>
@@ -116,7 +117,8 @@ uint8_t Add_Device(uint32_t Device_ID)
     uint32_t Num=0;
     Num = Flash_Get_Learn_Nums();
     if(Num>30)return RT_ERROR;
-    Flash_LearnNums_Change(++Num);
+    Num++;
+    Flash_LearnNums_Change(Num);
     Global_Device.Num = Num;
     Global_Device.ID[Num] = Device_ID;
     Flash_Key_Change(Num,Device_ID);
@@ -128,7 +130,8 @@ uint8_t Delete_Device(uint32_t Device_ID)
     Num = Flash_Get_Learn_Nums();
     if(Num<1)return RT_ERROR;
     Global_Device.ID[Num] = 0;
-    Flash_LearnNums_Change(--Num);
+    Num--;
+    Flash_LearnNums_Change(Num);
     Global_Device.Num = Num;
     Flash_Key_Change(Num,Device_ID);
     return RT_EOK;
@@ -173,7 +176,7 @@ void Update_All_Time(void)
     uint16_t Num = Global_Device.Num;
     if(!Num)return;
     uint32_t Time = 0;
-    for(uint8_t i=0;i<=Num;i++)
+    for(uint8_t i=1;i<=Num;i++)
     {
         Time = Global_Device.ID_Time[i];//查询剩余时间
         Time++;                         //自增
@@ -201,7 +204,7 @@ void Detect_All_Time(void)
         if(Global_Device.ID_Time[num]>=24)
         {
             //掉线ID上报
-            beep_start(0,5);
+            OfflineWarning();
             LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
         }
         num--;
@@ -225,7 +228,7 @@ void LoadDevice2Memory(void)//数据载入到内存中
     memset(&Global_Device,0,sizeof(Global_Device));
     Global_Device.Num = Flash_Get_Learn_Nums();
     LOG_D("num is %d",Global_Device.Num);
-    for(uint8_t i=0;i<=Global_Device.Num;i++)
+    for(uint8_t i=1;i<=Global_Device.Num;i++)
     {
         Global_Device.ID[i] = Flash_Get_Key_Value(i);
         LOG_D("GOT ID is %ld",Global_Device.ID[i]);

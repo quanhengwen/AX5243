@@ -29,17 +29,17 @@
 
 int main(void)
 {
+    led_Init();
+    Moto_Init();
     fal_init();
     easyflash_init();
     Boot_Times_Record();
     button_Init();
-    led_Init();
     WaterScan_Init();
     Key_Reponse();
     LoadDevice2Memory();
     Radio_Task_Init();
-    Moto_Init();
-    WiFi_Init();
+    //WiFi_Init();
     while (1)
     {
         rt_thread_mdelay(1000);

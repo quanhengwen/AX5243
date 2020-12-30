@@ -16,7 +16,9 @@ enum Device_Status
     SlaverLowPower,
     SlaverWaterAlarmActive,
     MasterLostPeak,
-    MasterWaterAlarmActive
+    MasterWaterAlarmActive,
+    Learn,
+    Offline
 };
 
 void Key_Reponse(void);

@@ -14,6 +14,7 @@ void SlaverWaterAlarmWarning(void);
 void MasterLostPeakWarning(void);
 void MasterWaterAlarmWarning(void);
 void BackToNormal(void);
+void OfflineWarning(void);
 
 
 #endif /* APPLICATIONS_STATUS_H_ */

@@ -25,7 +25,7 @@ void RTC_Timer_Entry(void)
     LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
     if(RTC_Counter==4)
     {
-        Moto_Detect();
+        //Moto_Detect();
     }
     if(RTC_Counter<24)
     {
@@ -94,7 +94,7 @@ void RTC_AlarmConfig(void)
     salarmstructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
     salarmstructure.AlarmTime.Hours = 0;
     salarmstructure.AlarmTime.Minutes = 0;
-    salarmstructure.AlarmTime.Seconds = 1;
+    salarmstructure.AlarmTime.Seconds = 3;
     salarmstructure.AlarmTime.SubSeconds = 0;
 
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BIN) == HAL_OK)

@@ -49,6 +49,8 @@ void IRQ_Bounding(void);
 void Radio_Task_Init(void);
 void WirelessBitRate_20K(void);
 void transmit_packet_task(uint8_t *Buf, uint8_t u8Len);
+void Normal_send(uint8_t *Buf, uint8_t u8Len);
+void Wor_send(uint8_t *Buf, uint8_t u8Len);
 #endif
 
 /*************************the end of file*******************************/
