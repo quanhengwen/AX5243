@@ -652,7 +652,7 @@ void reset_timer(void)
 }
 void ax5043_receiver_on_wor(void)
 {
-    unsigned char ubTemp;
+    //unsigned char ubTemp;
     SpiWriteSingleAddressRegister(AX5043_BGNDRSSIGAIN,0x02);
     SpiWriteSingleAddressRegister(REG_AX5043_RADIOEVENTMASK0,0);
     SpiWriteSingleAddressRegister(REG_AX5043_FIFOSTAT,0x03);
@@ -1109,14 +1109,18 @@ void transmit_packet_task(uint8_t *Buf, uint8_t u8Len)
     SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK1, 0x01);     //AX5043_IRQMASK1 = 0x01; // enable xtal ready interrupt
 }
 extern void radio_test(void);
-void radio_send(void)
+void Normal_send(void)
 {
-    axradio_txbuffer_cnt = 160;
+    axradio_txbuffer_cnt = 112;
     radio_test();
-//    uint8_t buf[]={1,2,3,4,5,6,7,8,9,0};
-//    transmit_packet_task(buf,sizeof(buf));
 }
-MSH_CMD_EXPORT(radio_send,radio_send);
+MSH_CMD_EXPORT(Normal_send,Normal_send);
+void Wor_send(void)
+{
+    axradio_txbuffer_cnt = 0;
+    radio_test();
+}
+MSH_CMD_EXPORT(Wor_send,Wor_send);
 void radio_send1(void)
 {
     uint8_t buf[]={0xA,0xB,0xC,0xD,0xE,0xF};

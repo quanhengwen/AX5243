@@ -43,7 +43,7 @@ typedef unsigned long useconds_t;
 typedef	unsigned long clock_t; /* clock() */
 
 #ifndef NULL
-#define NULL        (0)
+#define NULL        RT_NULL
 #endif
 
 #define __u_char_defined

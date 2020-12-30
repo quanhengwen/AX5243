@@ -12,20 +12,22 @@
 #include "pin_config.h"
 #include "wifi-uart.h"
 #include "ulog.h"
+#include "wifi.h"
+#include "wifi-service.h"
 
-#define DBG_TAG "wifi"
+#define DBG_TAG "wifi-uart"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
 /* 用于接收消息的信号量 */
 static struct rt_semaphore rx_sem;
 static rt_device_t serial;
-static rt_thread_t WiFi_Thread = RT_NULL;
+static rt_thread_t WiFi_Uart_Thread = RT_NULL;
 struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
 
 #define WiFi_UART_NAME                   "uart1"
 
-void WifiEnable(void)
+void wifi_gpio_enable(void)
 {
     rt_pin_mode(WIFIEN,PIN_MODE_OUTPUT);
     rt_pin_write(15,0);
@@ -56,17 +58,22 @@ static char uart_sample_get_char(void)
 void data_parsing(void)
 {
     char ch;
-    LOG_D("WiFi Thread Init Success\r\n");
+    LOG_D("WiFi-Uart Init Success\r\n");
 
     while (1)
     {
         ch = uart_sample_get_char();
-        LOG_D("GET Data is %X\r\n",ch);
-        rt_device_write(serial,0,&ch,1);
+        uart_receive_input(ch);
+        //LOG_D("GET Data is %X\r\n",ch);
+        //rt_device_write(serial,0,&ch,1);
     }
 }
-
-void WIFI_Uart_Init(void)
+void WiFi_Byte_Send(uint8_t data)
+{
+    LOG_D("Data %X is Send OK\r\n",data);
+    rt_device_write(serial,0,&data,1);
+}
+void wifi_uart_init(void)
 {
     char uart_name[RT_NAME_MAX];
 
@@ -94,13 +101,23 @@ void WIFI_Uart_Init(void)
     rt_device_set_rx_indicate(serial, uart_rx_ind);
 
     /* 创建 serial 线程 */
-    WiFi_Thread = rt_thread_create("serial", (void (*)(void *parameter))data_parsing, RT_NULL, 1024, 25, 10);
+    WiFi_Uart_Thread = rt_thread_create("serial", (void (*)(void *parameter))data_parsing, RT_NULL, 1024, 25, 10);
 
     /* 创建成功则启动线程 */
-    if (WiFi_Thread != RT_NULL)
+    if (WiFi_Uart_Thread != RT_NULL)
     {
-        rt_thread_startup(WiFi_Thread);
+        rt_thread_startup(WiFi_Uart_Thread);
     }
-    LOG_D("Wifi Init Success\r\n");
 }
-MSH_CMD_EXPORT(WIFI_Uart_Init, WIFI_Uart_Init);
+MSH_CMD_EXPORT(wifi_uart_init, wifi_uart_init);
+void WiFi_Init(void)
+{
+    uint8_t stat;
+    wifi_gpio_enable();
+    wifi_uart_init();
+    wifi_protocol_init();
+    wifi_service_init();
+    mcu_set_wifi_mode(0);
+    stat = mcu_get_wifimode_flag();
+    if(stat)LOG_D("Wifi Init Success\r\n"); else LOG_D("Wifi Init Fail\r\n");
+}

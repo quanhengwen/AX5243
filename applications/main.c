@@ -21,6 +21,7 @@
 #include "flashwork.h"
 #include "key.h"
 #include "wifi-uart.h"
+#include "moto.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -35,10 +36,10 @@ int main(void)
     led_Init();
     WaterScan_Init();
     Key_Reponse();
-    WifiEnable();
     LoadDevice2Memory();
     Radio_Task_Init();
     Moto_Init();
+    WiFi_Init();
     while (1)
     {
         rt_thread_mdelay(1000);
