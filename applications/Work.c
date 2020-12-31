@@ -94,6 +94,7 @@ void WaterScan_Callback(void *parameter)
             if(WarningStatus_Temp==0&&WarningStatus==2)
             {
                 WarningStatus = WarningStatus_Temp;
+                //MasterAlarmWaterDisable();
                 LOG_D("Warning But Not Reponse\r\n");
             }
             else

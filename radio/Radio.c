@@ -638,6 +638,7 @@ void ax5043_set_registers_rxwor(void)
     SpiWriteLongAddressRegister(AX5043_REG_TMGRXPREAMBLE1,0x19);
     SpiWriteLongAddressRegister(AX5043_REG_PKTMISCFLAGS,0x03);
 }
+MSH_CMD_EXPORT(ax5043_set_registers_rxwor,ax5043_set_registers_rxwor);
 void reset_timer(void)
 {
     uint16_t wp = 5000;
@@ -677,6 +678,13 @@ void ax5043_receiver_on_wor(void)
 
 }
 MSH_CMD_EXPORT(ax5043_receiver_on_wor,ax5043_receiver_on_wor);
+void read(void)
+{
+    LOG_D("1 is %x\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUP1));
+    LOG_D("0 is %x\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUP0));
+    LOG_D("time is %d\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUPTIMER1));
+}
+MSH_CMD_EXPORT(read,read);
 void enable_wor(void)
 {
     wor_flag=1;
@@ -686,13 +694,17 @@ void enable_wor(void)
     reset_timer();
 }
 MSH_CMD_EXPORT(enable_wor,enable_wor);
-void read(void)
+void restart_wor(void)
 {
-    LOG_D("1 is %x\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUP1));
-    LOG_D("0 is %x\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUP0));
-    LOG_D("time is %d\r\n",SpiReadLongAddressRegister(REG_AX5043_WAKEUPTIMER1));
+//    LOG_D("Before");
+//    readirq();
+    read();
+    ax5043_set_registers_rxwor();
+    ax5043_receiver_on_wor();
+//    LOG_D("After");
+//    readirq();
 }
-MSH_CMD_EXPORT(read,read);
+MSH_CMD_EXPORT(restart_wor,restart_wor);
 /***********************************************************************
 * Funcation ��void RdioXtalON(void)
 * Description��
@@ -1119,14 +1131,19 @@ void Normal_send(uint8_t *Buf, uint8_t u8Len)
 void Wor_send(uint8_t *Buf, uint8_t u8Len)
 {
     LOG_D("Wor_send\r\n");
-    axradio_txbuffer_cnt = 112;
+    axradio_txbuffer_cnt = 130;
     transmit_packet_task(Buf,u8Len);
 }
-void wor_test(void)
+void wor_test1(void)
 {
     WorSend(28000001, 30, 4, 1);
 }
-MSH_CMD_EXPORT(wor_test,wor_test);
+MSH_CMD_EXPORT(wor_test1,wor_test1);
+void wor_test2(void)
+{
+    WorSend(28000001, 30, 4, 0);
+}
+MSH_CMD_EXPORT(wor_test2,wor_test2);
 void radio_send1(void)
 {
     uint8_t buf[]={0xA,0xB,0xC,0xD,0xE,0xF};
@@ -1352,8 +1369,16 @@ void Radio_Task_Callback(void *parameter)
                             }
                             Tx_Done_Callback(TXBuff,TxLen);
                             SpiWriteSingleAddressRegister(REG_AX5043_RADIOEVENTMASK0, 0x00);
-                            SetReceiveMode();           //接收模式
-                            AX5043ReceiverON();         //接收开启
+                            if(wor_flag)
+                            {
+                                restart_wor();
+                            }
+                            else
+                            {
+                                SetReceiveMode();           //接收模式
+                                AX5043ReceiverON();         //接收开启
+                            }
+
                             break;
                         case trxstate_rxwor:                 //D
                             LOG_D("Before");
@@ -1405,5 +1430,6 @@ void Radio_Task_Init(void)
     SetReceiveMode();           //接收模式
     AX5043ReceiverON();         //接收开启
     readirq();
+    RadioDequeueTaskInit();
 }
 /********************************the end of file***********************/

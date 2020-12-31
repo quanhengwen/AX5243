@@ -12,6 +12,8 @@
 #include "key.h"
 #include "led.h"
 #include "status.h"
+#include "flashwork.h"
+#include "radio_encoder.h"
 #include "Moto.h"
 #include "work.h"
 
@@ -21,6 +23,7 @@
 
 extern enum Device_Status Now_Status;
 extern uint8_t ValveStatus;
+extern uint16_t Radio_Counter;
 
 void SlaverLowBatteryWarning(void)
 {
@@ -50,10 +53,21 @@ void MasterWaterAlarmWarning(void)
 {
     beep_start(0,2);//红灯,蜂鸣器三下
     Moto_Close();
+    if(GetDoorID())
+    {
+        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,1);
+    }
     Now_Status = MasterWaterAlarmActive;
     LOG_D("MasterWaterAlarmWarning\r\n");
 }
 MSH_CMD_EXPORT(MasterWaterAlarmWarning,MasterWaterAlarmWarning);
+void MasterAlarmWaterDisable(void)
+{
+    if(GetDoorID())
+    {
+        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,0);
+    }
+}
 void OfflineWarning(void)
 {
     if(Now_Status!=Offline)

@@ -14,6 +14,7 @@
 #include "moto.h"
 #include "Radio_Decoder.h"
 #include "work.h"
+#include "status.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -130,6 +131,7 @@ void Key_Reponse_Callback(void *parameter)
                 Now_Status = Close;
                 Disable_Warining();//消警
                 key_down();
+                MasterAlarmWaterDisable();
                 LOG_D("MasterWaterAlarmActive With OFF\r\n");
                 break;
             case Learn:

@@ -13,3 +13,5 @@ uint8_t Clear_Device_Time(uint32_t Device_ID);//更新时间戳为0
 void Detect_All_Time(void);
 void Boot_Times_Record(void);
 void LoadDevice2Memory(void);
+uint8_t Add_DoorDevice(uint32_t Device_ID);
+uint32_t GetDoorID(void);

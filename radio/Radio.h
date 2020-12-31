@@ -39,7 +39,7 @@ char SetChannel(unsigned char ubNum );
 void SetTransmitMode(void);
 void transmit_packet(void);
 void ReceiveData(void);
-
+void enable_wor(void);
 //#else
 void AX5043ReceiverON(void);
 void SetReceiveMode(void);

@@ -19,6 +19,7 @@ typedef struct _env_list {
 typedef struct
 {
     uint32_t Num;
+    uint32_t DoorID;
     uint32_t ID[50];
     uint32_t ID_Time[50];
 }Device_Info;
@@ -123,6 +124,24 @@ uint8_t Add_Device(uint32_t Device_ID)
     Global_Device.ID[Num] = Device_ID;
     Flash_Key_Change(Num,Device_ID);
     return RT_EOK;
+}
+uint8_t Add_DoorDevice(uint32_t Device_ID)
+{
+    uint32_t Num=0;
+    Num = Flash_Get_Learn_Nums();
+    if(Num>30)return RT_ERROR;
+    Num++;
+    Flash_LearnNums_Change(Num);
+    Global_Device.Num = Num;
+    Global_Device.ID[Num] = Device_ID;
+    Flash_Key_Change(Num,Device_ID);
+    Global_Device.DoorID = Num;
+    Flash_Key_Change(99999999,Global_Device.DoorID);
+    return RT_EOK;
+}
+uint32_t GetDoorID(void)
+{
+    return Global_Device.ID[Global_Device.DoorID];
 }
 uint8_t Delete_Device(uint32_t Device_ID)
 {
@@ -233,5 +252,6 @@ void LoadDevice2Memory(void)//数据载入到内存中
         Global_Device.ID[i] = Flash_Get_Key_Value(i);
         LOG_D("GOT ID is %ld",Global_Device.ID[i]);
     }
+    Global_Device.DoorID = Flash_Get_Key_Value(99999999);
 }
 MSH_CMD_EXPORT(LoadDevice2Memory,LoadDevice2Memory);

@@ -28,6 +28,7 @@
 extern rt_timer_t Learn_Timer;
 extern uint32_t Self_Id;
 
+
 #define DBG_TAG "radio_decoder"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
@@ -48,6 +49,7 @@ extern enum Device_Status Now_Status;
 extern uint8_t ValveStatus ;
 uint8_t Learn_Flag=0;
 uint8_t Last_Close_Flag=0;
+uint16_t Radio_Counter=0;
 
 uint8_t Check_Valid(uint32_t From_id)
 {
@@ -76,14 +78,6 @@ void Start_Learn(void)
     {
         LOG_D("Now in Warining Mode\r\n");
     }
-//    else
-//    {
-//        rt_timer_stop(Learn_Timer);
-//        Disable_Warining();//消警
-//        //beep_stop();
-//        Learn_Flag = 0;
-//        LOG_D("Learn timer is stop\r\n");
-//    }
 }
 void Stop_Learn(void)
 {
@@ -105,14 +99,23 @@ void Device_Learn(Message buf)
             if(Check_Valid(buf.From_ID)!=1)//如果数据库不存在该值
             {
                 LOG_D("Not Include This Device\r\n");
-                Add_Device(buf.From_ID);//向数据库写入
-                LOG_D("Write to Flash With ID %d\r\n",buf.From_ID);
+                if(buf.From_ID<30000000)
+                {
+                    Add_Device(buf.From_ID);//向数据库写入
+                    LOG_D("Slaver Write to Flash With ID %d\r\n",buf.From_ID);
+                }
+                else if(buf.From_ID>30000000 && buf.From_ID<40000000)
+                {
+                    Add_DoorDevice(buf.From_ID);//向数据库写入
+                    LOG_D("Door Write to Flash With ID %d\r\n",buf.From_ID);
+                }
             }
             else//存在该值
             {
                 LOG_D("Include This Device，Send Ack\r\n");
             }
-            RadioSend(buf.From_ID,buf.Counter,3,1);
+            RadioEnqueue(0,buf.From_ID,buf.Counter,3,1);
+            //RadioSend(buf.From_ID,buf.Counter,3,1);
         }
         else LOG_D("Not in Learn Mode\r\n");
         break;
@@ -126,29 +129,35 @@ void Device_Learn(Message buf)
             else//存在该值
             {
                 LOG_D("Include This Device，Send Confirmed\r\n");
-                RadioSend(buf.From_ID,buf.Counter,3,2);
-                //rt_timer_start(Learn_Timer);
+                RadioEnqueue(0,buf.From_ID,buf.Counter,3,2);
+                //RadioSend(buf.From_ID,buf.Counter,3,2);
             }
         }
         else LOG_D("Not in Learn Mode\r\n");
         break;
     case 3:
-        //Learn_Flag = 0;
         if(Check_Valid(buf.From_ID))//如果数据库不存在该值
         {
             Start_Learn();
-            RadioSend(buf.From_ID,buf.Counter,3,3);
+            //RadioSend(buf.From_ID,buf.Counter,3,3);
+            RadioEnqueue(0,buf.From_ID,buf.Counter,3,3);
         }
         else LOG_D("Unknown Device Want to Learn\r\n");
         break;
     }
     rt_timer_start(Learn_Timer);
 }
+
 void DataSolve(Message buf)
 {
     switch(buf.Command)
     {
     case 1://测试模拟报警（RESET）
+        if(Check_Valid(buf.From_ID))
+        {
+            //RadioSend(buf.From_ID,buf.Counter,1,1);//正常握手
+            RadioEnqueue(0,buf.From_ID,buf.Counter,1,1);
+        }
         LOG_D("Test\r\n");
         break;
     case 2://握手包
@@ -157,12 +166,14 @@ void DataSolve(Message buf)
         {
             if(buf.Data==2)
             {
-                RadioSend(buf.From_ID,buf.Counter,2,2);//低电量报警
+                //RadioSend(buf.From_ID,buf.Counter,2,2);//低电量报警
+                RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
                 SlaverLowBatteryWarning();
             }
             else
             {
-                RadioSend(buf.From_ID,buf.Counter,2,0);//正常握手
+                //RadioSend(buf.From_ID,buf.Counter,2,0);//正常握手
+                RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
                 Disable_Warining();
                 //Moto_Open();
             }
@@ -192,16 +203,29 @@ void DataSolve(Message buf)
             LOG_D("Warning From %ld\r\n",buf.From_ID);
             if(buf.Data==0)
             {
-                if(buf.Command == 4)
+                LOG_D("Warning With Command 4 Data 0\r\n");
+                if(GetDoorID()==buf.From_ID)
                 {
-                    LOG_D("Warning With Command 4\r\n");
-                    RadioSend(buf.From_ID,buf.Counter,4,0);
+                }
+                else
+                {
+                    RadioEnqueue(0,buf.From_ID,buf.Counter,4,0);
+                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
                 }
             }
-            else
+            else if(buf.Data==1)
             {
-                RadioSend(buf.From_ID,buf.Counter,4,1);
-                Enable_Warining();
+                LOG_D("Warning With Command 4 Data 1\r\n");
+                if(GetDoorID()==buf.From_ID)
+                {
+                }
+                else
+                {
+                    RadioEnqueue(0,buf.From_ID,buf.Counter,4,1);
+                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
+                    Enable_Warining();
+                }
+
             }
         }
         else
@@ -219,12 +243,14 @@ void DataSolve(Message buf)
                 Disable_Warining();
                 key_down();
                 Moto_Open();
-                RadioSend(buf.From_ID,buf.Counter,5,1);
+                //RadioSend(buf.From_ID,buf.Counter,5,1);
+                RadioEnqueue(0,buf.From_ID,buf.Counter,5,1);
             }
             else
             {
                 LOG_D("Pwr On From %ld On Warning\r\n",buf.From_ID);
-                RadioSend(buf.From_ID,buf.Counter,5,2);
+                //RadioSend(buf.From_ID,buf.Counter,5,2);
+                RadioEnqueue(0,buf.From_ID,buf.Counter,5,2);
             }
         }
         else
@@ -243,13 +269,15 @@ void DataSolve(Message buf)
                 just_ring();
                 Last_Close_Flag=1;
                 Moto_Close();
-                RadioSend(buf.From_ID,buf.Counter,6,0);
+                //RadioSend(buf.From_ID,buf.Counter,6,0);
+                RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
             else if(Now_Status == SlaverWaterAlarmActive)
             {
                 LOG_D("Warning With Command 6\r\n");
                 Disable_Warining();
-                RadioSend(buf.From_ID,buf.Counter,6,0);
+                //RadioSend(buf.From_ID,buf.Counter,6,0);
+                RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
         }
         else
@@ -271,5 +299,6 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
         sscanf((const char *)&rx_buffer[1],"{%ld,%ld,%d,%d,%d}",&Rx_message.Target_ID,&Rx_message.From_ID,&Rx_message.Counter,&Rx_message.Command,&Rx_message.Data);
         Clear_Device_Time(Rx_message.From_ID);
         if(Rx_message.Target_ID==Self_Id ||Rx_message.Target_ID==99999999)DataSolve(Rx_message);
+        Radio_Counter = Rx_message.Counter;
     }
 }
