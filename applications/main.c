@@ -22,6 +22,7 @@
 #include "key.h"
 #include "wifi-uart.h"
 #include "moto.h"
+#include "RTCWork.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -39,6 +40,7 @@ int main(void)
     Key_Reponse();
     LoadDevice2Memory();
     Radio_Task_Init();
+    //RTC_Init();
     //WiFi_Init();
     while (1)
     {

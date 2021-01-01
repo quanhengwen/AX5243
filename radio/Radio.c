@@ -696,13 +696,13 @@ void enable_wor(void)
 MSH_CMD_EXPORT(enable_wor,enable_wor);
 void restart_wor(void)
 {
-//    LOG_D("Before");
-//    readirq();
+    LOG_D("Before");
+    readirq();
     read();
     ax5043_set_registers_rxwor();
     ax5043_receiver_on_wor();
-//    LOG_D("After");
-//    readirq();
+    LOG_D("After");
+    readirq();
 }
 MSH_CMD_EXPORT(restart_wor,restart_wor);
 /***********************************************************************

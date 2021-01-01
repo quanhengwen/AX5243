@@ -21,6 +21,7 @@
 #include <rtdbg.h>
 
 rt_thread_t key_response_t = RT_NULL;
+
 uint8_t K0_Status=0;
 uint8_t K0_Long_Status=0;
 uint8_t K1_Status=0;
@@ -70,12 +71,6 @@ void Key_Reponse_Callback(void *parameter)
             case SlaverLowPower:
                 break;
             case SlaverWaterAlarmActive:
-//                key_down();
-//                Disable_Warining();//消警
-//                Now_Status = Open;
-//                //Moto_Open();
-//                beep_start(0,2);//蜂鸣器三下
-//                LOG_D("SlaverWaterAlarmActive With ON\r\n");
                 break;
             case MasterLostPeak:
                 key_down();
@@ -109,16 +104,8 @@ void Key_Reponse_Callback(void *parameter)
                 LOG_D("Valve Close With OFF\r\n");
                 break;
             case SlaverLowPower:
-//                key_down();
-//                Now_Status = Close;
-//                Disable_Warining();//消警
-//                LOG_D("SlaverLowPower With OFF\r\n");
                 break;
             case SlaverWaterAlarmActive:
-//                key_down();
-//                Now_Status = Close;
-//                Disable_Warining();//消警
-//                LOG_D("SlaverWaterAlarmActive With OFF\r\n");
                 break;
             case MasterLostPeak:
                 key_down();
@@ -127,7 +114,6 @@ void Key_Reponse_Callback(void *parameter)
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:
-                //key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
                 key_down();
@@ -173,7 +159,6 @@ void Learn_Timer_Callback(void *parameter)
     LOG_D("Learn timer is Timeout\r\n");
     Disable_Warining();//消警
     Stop_Learn();
-
 }
 void Key_Reponse(void)
 {

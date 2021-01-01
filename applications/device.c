@@ -110,12 +110,10 @@ void K1_LongFree_Release(void *parameter)
 }
 uint8_t Read_K0_Level(void)
 {
-    //rt_kprintf("K0 is %d\r\n",rt_pin_read(K0));
     return rt_pin_read(K0);
 }
 uint8_t Read_K1_Level(void)
 {
-    //rt_kprintf("K1 is %d\r\n",rt_pin_read(K1));
     return rt_pin_read(K1);
 }
 void Detect_KO_K1(void)
@@ -138,7 +136,7 @@ void button_task_entry(void *parameter)
         Button_Attach(&Key1,BUTTON_DOWM,K1_Sem_Release);
         Button_Attach(&Key0,BUTTON_LONG,K0_LongSem_Release);
         Button_Attach(&Key1,BUTTON_LONG,K1_LongSem_Release);
-        //Button_Attach(&Key0,BUTTON_LONG_FREE,K0_LongFree_Release);
+        Button_Attach(&Key0,BUTTON_LONG_FREE,K0_LongFree_Release);
         Button_Attach(&Key1,BUTTON_LONG_FREE,K1_LongFree_Release);
 
         while(1)

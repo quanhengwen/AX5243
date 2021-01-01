@@ -20,8 +20,10 @@
 
 rt_timer_t Moto_Timer1,Moto_Timer2 = RT_NULL;
 uint8_t Turn1_Flag,Turn2_Flag = 0;
+
 extern uint8_t ValveStatus;
 extern enum Device_Status Now_Status;
+
 void Moto_Open(void)
 {
     LOG_D("Moto is Open\r\n");
@@ -105,19 +107,3 @@ void Moto_Detect(void)
     }
 }
 MSH_CMD_EXPORT(Moto_Detect,Moto_Detect);
-void test_moto(void)//打开turn1高，关闭turn0高
-{
-    rt_pin_mode(Moto,0);
-    rt_pin_mode(Turn1,1);
-    rt_pin_mode(Turn2,1);
-    rt_pin_write(Moto,1);
-    while(1)
-    {
-        rt_kprintf("Turn1 is %d\r\n",rt_pin_read(Turn1));
-        rt_kprintf("Turn2 is %d\r\n",rt_pin_read(Turn2));
-        rt_kprintf("Senor1 is %d\r\n",rt_pin_read(Turn1));
-        rt_kprintf("Senor2 is %d\r\n",rt_pin_read(Turn2));
-        rt_thread_mdelay(1000);
-    }
-}
-MSH_CMD_EXPORT(test_moto,test_moto);

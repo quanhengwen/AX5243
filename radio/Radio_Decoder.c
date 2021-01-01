@@ -25,10 +25,6 @@
 #include "led.h"
 #include "key.h"
 
-extern rt_timer_t Learn_Timer;
-extern uint32_t Self_Id;
-
-
 #define DBG_TAG "radio_decoder"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
@@ -42,14 +38,14 @@ typedef struct
     int Data;
 }Message;
 
-uint32_t Device_List[30]={12345678};
-uint8_t Device_Num=1;
-
-extern enum Device_Status Now_Status;
-extern uint8_t ValveStatus ;
 uint8_t Learn_Flag=0;
 uint8_t Last_Close_Flag=0;
 uint16_t Radio_Counter=0;
+
+extern rt_timer_t Learn_Timer;
+extern uint8_t ValveStatus ;
+extern uint32_t Self_Id;
+extern enum Device_Status Now_Status;
 
 uint8_t Check_Valid(uint32_t From_id)
 {
@@ -86,7 +82,6 @@ void Stop_Learn(void)
     Disable_Warining();//消警
     beep_start(0, 6);
     if(ValveStatus)Moto_Open();else Moto_Close();
-    //beep_stop();
     LOG_D("Learn timer is stop\r\n");
 }
 void Device_Learn(Message buf)
@@ -115,7 +110,6 @@ void Device_Learn(Message buf)
                 LOG_D("Include This Device，Send Ack\r\n");
             }
             RadioEnqueue(0,buf.From_ID,buf.Counter,3,1);
-            //RadioSend(buf.From_ID,buf.Counter,3,1);
         }
         else LOG_D("Not in Learn Mode\r\n");
         break;
@@ -130,7 +124,6 @@ void Device_Learn(Message buf)
             {
                 LOG_D("Include This Device，Send Confirmed\r\n");
                 RadioEnqueue(0,buf.From_ID,buf.Counter,3,2);
-                //RadioSend(buf.From_ID,buf.Counter,3,2);
             }
         }
         else LOG_D("Not in Learn Mode\r\n");
@@ -139,7 +132,6 @@ void Device_Learn(Message buf)
         if(Check_Valid(buf.From_ID))//如果数据库不存在该值
         {
             Start_Learn();
-            //RadioSend(buf.From_ID,buf.Counter,3,3);
             RadioEnqueue(0,buf.From_ID,buf.Counter,3,3);
         }
         else LOG_D("Unknown Device Want to Learn\r\n");
@@ -155,7 +147,6 @@ void DataSolve(Message buf)
     case 1://测试模拟报警（RESET）
         if(Check_Valid(buf.From_ID))
         {
-            //RadioSend(buf.From_ID,buf.Counter,1,1);//正常握手
             RadioEnqueue(0,buf.From_ID,buf.Counter,1,1);
         }
         LOG_D("Test\r\n");
@@ -166,13 +157,11 @@ void DataSolve(Message buf)
         {
             if(buf.Data==2)
             {
-                //RadioSend(buf.From_ID,buf.Counter,2,2);//低电量报警
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
                 SlaverLowBatteryWarning();
             }
             else
             {
-                //RadioSend(buf.From_ID,buf.Counter,2,0);//正常握手
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
                 Disable_Warining();
                 //Moto_Open();
@@ -188,7 +177,6 @@ void DataSolve(Message buf)
         if(Learn_Flag||buf.Data==3)
         {
             LOG_D("Learn\r\n");
-            //Disable_Warining();
             Device_Learn(buf);
         }
         else
@@ -243,13 +231,11 @@ void DataSolve(Message buf)
                 Disable_Warining();
                 key_down();
                 Moto_Open();
-                //RadioSend(buf.From_ID,buf.Counter,5,1);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,5,1);
             }
             else
             {
                 LOG_D("Pwr On From %ld On Warning\r\n",buf.From_ID);
-                //RadioSend(buf.From_ID,buf.Counter,5,2);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,5,2);
             }
         }
@@ -269,14 +255,12 @@ void DataSolve(Message buf)
                 just_ring();
                 Last_Close_Flag=1;
                 Moto_Close();
-                //RadioSend(buf.From_ID,buf.Counter,6,0);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
             else if(Now_Status == SlaverWaterAlarmActive)
             {
                 LOG_D("Warning With Command 6\r\n");
                 Disable_Warining();
-                //RadioSend(buf.From_ID,buf.Counter,6,0);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
         }

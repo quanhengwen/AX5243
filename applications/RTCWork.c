@@ -23,9 +23,9 @@ uint8_t RTC_Counter=0;
 void RTC_Timer_Entry(void)
 {
     LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
-    if(RTC_Counter==4)
+    if(RTC_Counter==4||RTC_Counter==9||RTC_Counter==14||RTC_Counter==19||RTC_Counter==24)
     {
-        //Moto_Detect();
+        Moto_Detect();
     }
     if(RTC_Counter<24)
     {

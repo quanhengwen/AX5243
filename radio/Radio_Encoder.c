@@ -22,23 +22,30 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
-uint32_t Self_Id = 10010861;
-//uint32_t Self_Id = 88998989;
-uint32_t Self_Counter = 0;
-extern uint8_t wor_flag;
-extern void restart_wor(void);
+rt_thread_t Radio_QueueTask = RT_NULL;
 
-uint8_t SendBusy = 0;
+uint32_t Self_Id = 10010861;
+uint32_t Self_Counter = 0;
+
+typedef struct
+{
+    uint8_t NowNum;
+    uint8_t TargetNum;
+    uint8_t wor_flag[10];
+    uint32_t Taget_Id[10];
+    uint8_t counter[10];
+    uint8_t Command[10];
+    uint8_t Data[10];
+}Radio_Queue;
+
+Radio_Queue Main_Queue={0};
+
 void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
 {
     LOG_D("Send ok\r\n");
-    SendBusy = 0;
-    //restart_wor();
-    //if(wor_flag)enable_wor();
 }
 void RadioSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
-    SendBusy = 1;
     uint8_t check = 0;
     uint8_t buf[35];
     if(counter<255)counter++;
@@ -63,7 +70,6 @@ void RadioSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 }
 void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
-    SendBusy = 1;
     uint8_t check = 0;
     uint8_t buf[35];
     if(counter<255)counter++;
@@ -91,18 +97,6 @@ void radio_test(void)
     RadioSend(10010861,0,5,0);
 }
 MSH_CMD_EXPORT(radio_test,radio_test);
-rt_thread_t Radio_QueueTask = RT_NULL;
-typedef struct
-{
-    uint8_t NowNum;
-    uint8_t TargetNum;
-    uint8_t wor_flag[10];
-    uint32_t Taget_Id[10];
-    uint8_t counter[10];
-    uint8_t Command[10];
-    uint8_t Data[10];
-}Radio_Queue;
-Radio_Queue Main_Queue={0};
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t NumTemp = Main_Queue.TargetNum;
