@@ -171,6 +171,23 @@ void beep_start(uint8_t led_id,int mode)
             led_Stop(1);
         }
         break;
+    case 8:
+        agile_led_set_light_mode(beep, "200,200", 5);
+        agile_led_start(beep);
+        if(led_id)
+        {
+            agile_led_set_light_mode(led1, "200,200", 5);
+            agile_led_start(led1);
+            led_Stop(0);
+        }
+        else
+        {
+            agile_led_stop(led0);
+            agile_led_set_light_mode(led0, "200,200", 5);
+            agile_led_start(led0);
+            led_Stop(1);
+        }
+        break;
     }
 }
 void led_test(void)

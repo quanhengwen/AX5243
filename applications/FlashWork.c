@@ -255,3 +255,11 @@ void LoadDevice2Memory(void)//数据载入到内存中
     Global_Device.DoorID = Flash_Get_Key_Value(99999999);
 }
 MSH_CMD_EXPORT(LoadDevice2Memory,LoadDevice2Memory);
+void DeleteAllDevice(void)//数据载入到内存中
+{
+    LOG_D("Before Delete num is %d",Global_Device.Num);
+    memset(&Global_Device,0,sizeof(Global_Device));
+    Flash_LearnNums_Change(0);
+    LOG_D("After Delete num is %d",Global_Device.Num);
+}
+MSH_CMD_EXPORT(DeleteAllDevice,DeleteAllDevice);

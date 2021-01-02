@@ -198,7 +198,10 @@ void DataSolve(Message buf)
                 else
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,0);
-                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
+                    if(Now_Status==SlaverWaterAlarmActive)
+                    {
+                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
+                    }
                 }
             }
             else if(buf.Data==1)
@@ -210,8 +213,12 @@ void DataSolve(Message buf)
                 else
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,1);
-                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
-                    Enable_Warining();
+                    if(Now_Status!=SlaverWaterAlarmActive)
+                    {
+                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
+                        Enable_Warining();
+                    }
+
                 }
 
             }

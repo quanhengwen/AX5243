@@ -77,8 +77,16 @@ void K1_LongSem_Release(void *parameter)
         {
             K1_OnceFlag=1;
             //key_down();
-            rt_sem_release(K1_Long_Sem);
-            LOG_D("K1 is Long\r\n");
+            if(K0_Long_Sem_Counter>5)
+            {
+                rt_sem_release(K0_K1_Long_Sem);
+                LOG_D("K0_K1 is Long\r\n");
+            }
+            else
+            {
+                rt_sem_release(K1_Long_Sem);
+                LOG_D("K1 is Long\r\n");
+            }
         }
         else
         {
@@ -141,7 +149,6 @@ void button_task_entry(void *parameter)
 
         while(1)
         {
-            Detect_KO_K1();
             Button_Process();
             rt_thread_mdelay(10);
         }

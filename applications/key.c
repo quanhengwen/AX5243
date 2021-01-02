@@ -15,6 +15,7 @@
 #include "Radio_Decoder.h"
 #include "work.h"
 #include "status.h"
+#include "flashwork.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -26,12 +27,14 @@ uint8_t K0_Status=0;
 uint8_t K0_Long_Status=0;
 uint8_t K1_Status=0;
 uint8_t K1_Long_Status=0;
+uint8_t K0_K1_Status=0;
 uint8_t ValveStatus = 0;
 
 extern rt_sem_t K0_Sem;
 extern rt_sem_t K0_Long_Sem;
 extern rt_sem_t K1_Sem;
 extern rt_sem_t K1_Long_Sem;
+extern rt_sem_t K0_K1_Long_Sem;
 
 extern uint8_t Learn_Flag;
 extern uint8_t Last_Close_Flag;
@@ -48,6 +51,7 @@ void Key_Reponse_Callback(void *parameter)
         K0_Long_Status = rt_sem_take(K0_Long_Sem, 0);
         K1_Status = rt_sem_take(K1_Sem, 0);
         K1_Long_Status = rt_sem_take(K1_Long_Sem, 0);
+        K0_K1_Status = rt_sem_take(K0_K1_Long_Sem, 0);
         if(K0_Status==RT_EOK)//ON
         {
             switch(Now_Status)
@@ -126,9 +130,10 @@ void Key_Reponse_Callback(void *parameter)
                 break;
             }
         }
-        else if(K0_Long_Status==RT_EOK)
+        else if(K0_K1_Status==RT_EOK)
         {
-
+            DeleteAllDevice();
+            beep_start(0,8);//蜂鸣器三下
         }
         else if(K1_Long_Status==RT_EOK)//OFF
         {

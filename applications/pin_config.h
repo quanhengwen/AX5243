@@ -10,7 +10,8 @@
 #ifndef APPLICATIONS_PIN_CONFIG_H_
 #define APPLICATIONS_PIN_CONFIG_H_
 //RADIO
-#define Radio_IRQ               38
+//#define Radio_IRQ               38
+#define Radio_IRQ               30
 #define XTAL_PWR                8
 #define MISO                    14
 #define MOSI                    31

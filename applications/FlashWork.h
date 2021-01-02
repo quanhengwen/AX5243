@@ -15,3 +15,4 @@ void Boot_Times_Record(void);
 void LoadDevice2Memory(void);
 uint8_t Add_DoorDevice(uint32_t Device_ID);
 uint32_t GetDoorID(void);
+void DeleteAllDevice(void);//数据载入到内存中;

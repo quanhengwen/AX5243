@@ -6,7 +6,7 @@
 #include <rtdevice.h>
 #include <string.h>
 
-#define BTN_NAME_MAX  32     //Ãû×Ö×î´óÎª32×Ö½Ú
+#define BTN_NAME_MAX  32     //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª32ï¿½Ö½ï¿½
 
 /* 
  The button debounce time is 40ms, the recommended calling period is 20ms.
@@ -100,6 +100,8 @@ typedef struct button
   
   rt_uint8_t Long_Time;                          /* Button press duration */
   
+  rt_uint8_t Long_Flag;                          /* Button press duration */
+
   struct button *Next;
   
 }Button_t;

@@ -26,9 +26,11 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+#define RADIO_SPI1_NSS_PORT GPIOA
+#define RADIO_SPI1_NSS_PIN GPIO_PIN_4
 
-#define RADIO_NSS_PORT GPIOC
-#define RADIO_NSS_PIN GPIO_PIN_8
+//#define RADIO_SPI2_NSS_PORT GPIOC
+//#define RADIO_SPI2_NSS_PIN GPIO_PIN_8
 #define RADIO_Device_Name "ax5043"
 
 struct rt_spi_device *ax5043_device;//spi设备
@@ -227,7 +229,9 @@ struct rt_spi_device *ax5043_radio_spi_init(const char *bus_name,const char *dev
     RT_ASSERT(bus_name);
 
     {
-        res = rt_hw_spi_device_attach( bus_name, device_name, RADIO_NSS_PORT, RADIO_NSS_PIN);
+        res = rt_hw_spi_device_attach( bus_name, device_name, RADIO_SPI1_NSS_PORT, RADIO_SPI1_NSS_PIN);
+        //res = rt_hw_spi_device_attach( bus_name, device_name, RADIO_SPI2_NSS_PORT, RADIO_SPI2_NSS_PORT);
+
 
         if (res != RT_EOK)
         {
@@ -283,7 +287,8 @@ void IRQ_Bounding(void)
 }
 void Ax5043_Spi_Init(void)
 {
-    ax5043_device = ax5043_radio_spi_init("spi2",RADIO_Device_Name);
+    ax5043_device = ax5043_radio_spi_init("spi1",RADIO_Device_Name);
+    //ax5043_device = ax5043_radio_spi_init("spi2",RADIO_Device_Name);
 }
 
 void AX5043_Reset(void)//复位
@@ -696,13 +701,9 @@ void enable_wor(void)
 MSH_CMD_EXPORT(enable_wor,enable_wor);
 void restart_wor(void)
 {
-    LOG_D("Before");
-    readirq();
     read();
     ax5043_set_registers_rxwor();
     ax5043_receiver_on_wor();
-    LOG_D("After");
-    readirq();
 }
 MSH_CMD_EXPORT(restart_wor,restart_wor);
 /***********************************************************************
