@@ -60,7 +60,7 @@ void Key_Reponse_Callback(void *parameter)
                 if(Last_Close_Flag==0)
                 {
                     key_down();
-                    Moto_Open();
+                    Moto_Open(NormalOpen);
                 }
                 else
                 {
@@ -79,7 +79,7 @@ void Key_Reponse_Callback(void *parameter)
             case MasterLostPeak:
                 key_down();
                 Now_Status = Open;
-                Moto_Open();
+                Moto_Open(NormalOpen);
                 LOG_D("MasterLostPeak With ON\r\n");
                 break;
             case MasterWaterAlarmActive:
@@ -104,7 +104,7 @@ void Key_Reponse_Callback(void *parameter)
             case Open:
                 key_down();
                 Last_Close_Flag = 0;
-                Moto_Close();
+                Moto_Close(NormalOff);
                 LOG_D("Valve Close With OFF\r\n");
                 break;
             case SlaverLowPower:

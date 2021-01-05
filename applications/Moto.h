@@ -10,8 +10,8 @@
 #ifndef APPLICATIONS_MOTO_H_
 #define APPLICATIONS_MOTO_H_
 
-void Moto_Open(void);
-void Moto_Close(void);
+void Moto_Open(uint8_t ActFlag);
+void Moto_Close(uint8_t ActFlag);
 void Moto_Init(void);
 void Moto_Detect(void);
 

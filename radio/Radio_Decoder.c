@@ -81,7 +81,7 @@ void Stop_Learn(void)
     rt_timer_stop(Learn_Timer);
     Disable_Warining();//消警
     beep_start(0, 6);
-    if(ValveStatus)Moto_Open();else Moto_Close();
+    if(ValveStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
     LOG_D("Learn timer is stop\r\n");
 }
 void Device_Learn(Message buf)
@@ -194,14 +194,12 @@ void DataSolve(Message buf)
                 LOG_D("Warning With Command 4 Data 0\r\n");
                 if(GetDoorID()==buf.From_ID)
                 {
+
                 }
                 else
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,0);
-                    if(Now_Status==SlaverWaterAlarmActive)
-                    {
-                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
-                    }
+                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
                 }
             }
             else if(buf.Data==1)
@@ -237,7 +235,7 @@ void DataSolve(Message buf)
                 LOG_D("Pwr On From %ld\r\n",buf.From_ID);
                 Disable_Warining();
                 key_down();
-                Moto_Open();
+                Moto_Open(OtherOpen);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,5,1);
             }
             else
@@ -261,7 +259,7 @@ void DataSolve(Message buf)
                 Disable_Warining();
                 just_ring();
                 Last_Close_Flag=1;
-                Moto_Close();
+                Moto_Close(OtherOff);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
             else if(Now_Status == SlaverWaterAlarmActive)

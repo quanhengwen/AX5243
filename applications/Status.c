@@ -27,7 +27,7 @@ extern uint16_t Radio_Counter;
 
 void SlaverLowBatteryWarning(void)
 {
-    Moto_Close();
+    Moto_Close(NormalOff);
     beep_start(0,0);//红灯,蜂鸣器一下
     Now_Status = SlaverLowPower;
     LOG_D("SlaverLowBatteryWarning\r\n");
@@ -35,7 +35,7 @@ void SlaverLowBatteryWarning(void)
 MSH_CMD_EXPORT(SlaverLowBatteryWarning,SlaverLowBatteryWarning);
 void SlaverWaterAlarmWarning(void)
 {
-    Moto_Close();
+    Moto_Close(NormalOff);
     beep_start(0,2);//红灯,蜂鸣器三下
     Now_Status = SlaverWaterAlarmActive;
     LOG_D("SlaverWaterAlarmWarning\r\n");
@@ -52,7 +52,7 @@ MSH_CMD_EXPORT(MasterLostPeakWarning,MasterLostPeakWarning);
 void MasterWaterAlarmWarning(void)
 {
     beep_start(0,2);//红灯,蜂鸣器三下
-    Moto_Close();
+    Moto_Close(NormalOff);
     if(GetDoorID())
     {
         RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,1);
@@ -72,7 +72,7 @@ void OfflineWarning(void)
 {
     if(Now_Status!=Offline)
     {
-        Moto_Close();
+        Moto_Close(NormalOff);
         beep_start(0,5);
         Now_Status = Offline;
         LOG_D("OfflineWarning\r\n");
@@ -91,11 +91,11 @@ void BackToNormal(void)
     led_Stop(1);
     if(ValveStatus)
     {
-        Moto_Open();
+        Moto_Open(NormalOpen);
     }
     else
     {
-        Moto_Close();
+        Moto_Close(NormalOff);
     }
 }
 

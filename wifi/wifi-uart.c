@@ -30,7 +30,7 @@ struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置�
 void wifi_gpio_enable(void)
 {
     rt_pin_mode(WIFIEN,PIN_MODE_OUTPUT);
-    rt_pin_write(15,0);
+    rt_pin_write(15,1);
 }
 /* 接收数据回调函数 */
 static rt_err_t uart_rx_ind(rt_device_t dev, rt_size_t size)
@@ -70,7 +70,7 @@ void data_parsing(void)
 }
 void WiFi_Byte_Send(uint8_t data)
 {
-    LOG_D("Data %X is Send OK\r\n",data);
+    //LOG_D("Data %X is Send OK\r\n",data);
     rt_device_write(serial,0,&data,1);
 }
 void wifi_uart_init(void)
@@ -118,6 +118,7 @@ void WiFi_Init(void)
     wifi_protocol_init();
     wifi_service_init();
     mcu_set_wifi_mode(0);
+    rt_thread_mdelay(100);
     stat = mcu_get_wifimode_flag();
     if(stat)LOG_D("Wifi Init Success\r\n"); else LOG_D("Wifi Init Fail\r\n");
 }

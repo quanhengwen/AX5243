@@ -23,7 +23,6 @@ static rt_thread_t WiFi_Service_Thread = RT_NULL;
 
 void service_callback(void *parameter)
 {
-    LOG_D("WiFi-Service Init Success/r/n");
     while(1)
     {
         wifi_uart_service();

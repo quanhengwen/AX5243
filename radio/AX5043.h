@@ -64,11 +64,12 @@
 #define     REG_AX5043_FIFOFREE0              0x2D
 
 
-#define  REG_AX5043_FIFOTHRESH1            0x2E
-#define  REG_AX5043_FIFOTHRESH0            0x2F
+#define  REG_AX5043_FIFOTHRESH1             0x2E
+#define  REG_AX5043_FIFOTHRESH0             0x2F
 
-#define REG_AX5043_PLLLOOPBOOST   0x38
-#define REG_AX5043_PLLCPIBOOST   0X39
+#define REG_AX5043_PLLLOOPBOOST             0x38
+#define REG_AX5043_PLLCPIBOOST              0X39
+#define REG_AX5043_RSSI                     0X40
 //==============================================================
 //config register Addr
 //============================================================

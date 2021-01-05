@@ -13,6 +13,7 @@
 #include "led.h"
 #include "key.h"
 #include "moto.h"
+#include "flashwork.h"
 
 #define DBG_TAG "moto"
 #define DBG_LVL DBG_LOG
@@ -23,22 +24,44 @@ uint8_t Turn1_Flag,Turn2_Flag = 0;
 
 extern uint8_t ValveStatus;
 extern enum Device_Status Now_Status;
+extern Device_Info Global_Device;
 
-void Moto_Open(void)
+void Moto_Open(uint8_t ActFlag)
 {
-    LOG_D("Moto is Open\r\n");
-    Now_Status = Open;
-    led_Long_Start(1);//绿灯
-    ValveStatus=1;
-    rt_pin_mode(Moto,0);
-    rt_pin_write(Moto,1);
+    if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOpen)
+    {
+        LOG_D("Moto is Open\r\n");
+        Now_Status = Open;
+        led_Long_Start(1);//绿灯
+        ValveStatus=1;
+        Global_Device.LastFlag = ActFlag;
+        Flash_Key_Change(99999999,ActFlag);
+        rt_pin_mode(Moto,0);
+        rt_pin_write(Moto,1);
+    }
+    else if(Global_Device.LastFlag != OtherOff )
+    {
+        LOG_D("Moto is Open\r\n");
+        Now_Status = Open;
+        led_Long_Start(1);//绿灯
+        ValveStatus=1;
+        Global_Device.LastFlag = ActFlag;
+        Flash_Key_Change(99999999,ActFlag);
+        rt_pin_mode(Moto,0);
+        rt_pin_write(Moto,1);
+    }
+    else {
+        LOG_D("No permissions to Open\r\n");
+    }
 }
-void Moto_Close(void)
+void Moto_Close(uint8_t ActFlag)
 {
     LOG_D("Moto is Close\r\n");
     Now_Status = Close;
     led_Stop(1);//绿灯
     ValveStatus=0;
+    Global_Device.LastFlag = ActFlag;
+    Flash_Key_Change(99999999,ActFlag);
     rt_pin_mode(Moto,0);
     rt_pin_write(Moto,0);
 }
@@ -54,7 +77,7 @@ void Turn2_Edge_Callback(void *parameter)
 }
 void Turn1_Timer_Callback(void *parameter)
 {
-    Moto_Open();
+    Moto_Open(NormalOpen);
     rt_pin_irq_enable(Turn1, PIN_IRQ_DISABLE);
     if(!Turn1_Flag)
     {
@@ -65,7 +88,7 @@ void Turn1_Timer_Callback(void *parameter)
 }
 void Turn2_Timer_Callback(void *parameter)
 {
-    Moto_Open();
+    Moto_Open(NormalOpen);
     rt_pin_irq_enable(Turn2, PIN_IRQ_DISABLE);
     if(!Turn2_Flag)
     {
@@ -80,11 +103,19 @@ void Moto_Init(void)
     rt_pin_mode(Turn2,PIN_MODE_INPUT);
     rt_pin_attach_irq(Turn1, PIN_IRQ_MODE_FALLING, Turn1_Edge_Callback, RT_NULL);
     rt_pin_attach_irq(Turn2, PIN_IRQ_MODE_FALLING, Turn2_Edge_Callback, RT_NULL);
-    LOG_D("Moto is Init\r\n");
     Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5100, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     Moto_Timer2 = rt_timer_create("Moto_Timer2", Turn2_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     just_ring();
-    Moto_Open();
+    if(Global_Device.LastFlag==NormalOpen || Global_Device.LastFlag==OtherOpen)
+    {
+        Moto_Open(Global_Device.LastFlag);
+    }
+    else if(Global_Device.LastFlag == 0)
+    {
+        Global_Device.LastFlag = NormalOpen;
+        Moto_Open(NormalOpen);
+    }
+    LOG_D("Moto is Init,Flag is %d\r\n",Global_Device.LastFlag);
 }
 
 MSH_CMD_EXPORT(Moto_Init,Moto_Init);
@@ -95,14 +126,14 @@ void Moto_Detect(void)
     {
         Turn1_Flag = 0;
         rt_pin_irq_enable(Turn1, PIN_IRQ_ENABLE);
-        Moto_Close();
+        Moto_Close(NormalOff);
         rt_timer_start(Moto_Timer1);
     }
     if(rt_pin_read(Turn2)==1&&ValveFuncFlag==1)
     {
         Turn2_Flag = 0;
         rt_pin_irq_enable(Turn2, PIN_IRQ_ENABLE);
-        Moto_Close();
+        Moto_Close(NormalOff);
         rt_timer_start(Moto_Timer2);
     }
 }

@@ -79,6 +79,7 @@ const DOWNLOAD_CMD_S download_cmd[] =
   {DPID_FAIL_STATE, DP_TYPE_FAULT},
   {DPID_DEVICE_ID, DP_TYPE_VALUE},
   {DPID_VALVE_STATE, DP_TYPE_BOOL},
+  {DPID_CLEAR_ERROR, DP_TYPE_BOOL},
 };
 
 
@@ -201,6 +202,49 @@ static unsigned char dp_download_valve_state_handle(const unsigned char value[],
     else
         return ERROR;
 }
+/*****************************************************************************
+函数名称 : dp_download_clear_error_handle
+功能描述 : 针对DPID_CLEAR_ERROR的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+        : sub_id_buf:子设备id
+        : sub_id_len:子设备id数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 只下发类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_clear_error_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+{
+    //示例:当前DP类型为BOOL
+    unsigned char ret;
+    //0:关/1:开
+    unsigned char clear_error;
+    
+    clear_error = mcu_get_dp_download_bool(value,length);
+    if(clear_error == 0) {
+        //开关关
+        /*****************************************************************************
+        //dp数据处理前需要判断是哪一个子设备id的dp
+        //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
+        if(my_strcmp(sub_id_buf,"1234") == 0) {
+    
+        }else if(my_strcmp(sub_id_buf,"5678") == 0) {
+    
+        }
+    
+        //若子设备id是“0000”，则表示网关本身的dp
+        *****************************************************************************/
+  
+    }else {
+        //开关开
+    }
+  
+    //处理完DP数据后应有反馈
+    ret = mcu_dp_bool_update(DPID_CLEAR_ERROR,clear_error, sub_id_buf, sub_id_len);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
 
 
 
@@ -233,6 +277,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
             //阀门状态处理函数
             LOG_D("Got Downlink With Valve\r\n");
             ret = dp_download_valve_state_handle(value,length,sub_id_buf,sub_id_len);
+        break;
+        case DPID_CLEAR_ERROR:
+            //故障清除处理函数
+            ret = dp_download_clear_error_handle(value,length,sub_id_buf,sub_id_len);
         break;
 
         default:

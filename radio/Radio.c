@@ -1032,6 +1032,7 @@ void ReceiveData(void)
                     rt_kprintf( " %02X", RXBuff[i] );
                 }
                 rt_kprintf("\r\n");
+                ubRssi = SpiReadSingleAddressRegister(REG_AX5043_RSSI);
                 ubTepm = SpiReadSingleAddressRegister(REG_AX5043_IRQMASK0);
                 SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK0, ubTepm&0xFE);   // disable FIFO not empty irq
                 break;
@@ -1058,6 +1059,7 @@ void ReceiveData(void)
                     goto dropchunk;
                 ubRssi = SpiReadSingleAddressRegister(REG_AX5043_FIFODATA);
                 uwRSSI = ubRssi - 32;
+                LOG_D("Got Rssi is %d\r\n",uwRSSI);
                 break;
 
             case AX5043_FIFOCMD_TIMER:

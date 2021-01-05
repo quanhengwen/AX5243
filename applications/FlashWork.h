@@ -2,6 +2,21 @@
 #define __FLASHWORK_H__
 #endif
 #include "stdint.h"
+
+typedef struct
+{
+    uint8_t  LastFlag;
+    uint32_t Num;
+    uint32_t DoorID;
+    uint32_t ID[50];
+    uint32_t ID_Time[50];
+}Device_Info;
+
+#define NormalOff 1<<0
+#define OtherOff 1<<1
+#define NormalOpen 1<<2
+#define OtherOpen 1<<3
+
 uint32_t Flash_Get(uint32_t id);
 uint8_t Flash_Get_Key_Valid(uint32_t key);
 void Flash_Key_Change(uint32_t key,uint32_t value);

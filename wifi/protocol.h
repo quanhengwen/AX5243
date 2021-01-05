@@ -363,6 +363,9 @@ mcu在wifi模块正确联网后可调用 get_green_time_with_zone() 函数发起
 //阀门状态(可下发可上报)
 //备注:
 #define DPID_VALVE_STATE 103
+//故障清除(只下发)
+//备注:
+#define DPID_CLEAR_ERROR 104
 
 
 

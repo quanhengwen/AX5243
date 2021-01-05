@@ -1,5 +1,6 @@
 #include "rtthread.h"
 #include "rtdevice.h"
+#include "rthw.h"
 #include "pin_config.h"
 #include "FlashWork.h"
 #include "status.h"
@@ -16,13 +17,7 @@
 typedef struct _env_list {
     char *key;
 } env_list;
-typedef struct
-{
-    uint32_t Num;
-    uint32_t DoorID;
-    uint32_t ID[50];
-    uint32_t ID_Time[50];
-}Device_Info;
+
 
 Device_Info Global_Device={0};
 void Boot_Times_Record(void)
@@ -136,7 +131,7 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
     Global_Device.ID[Num] = Device_ID;
     Flash_Key_Change(Num,Device_ID);
     Global_Device.DoorID = Num;
-    Flash_Key_Change(99999999,Global_Device.DoorID);
+    Flash_Key_Change(88888888,Global_Device.DoorID);
     return RT_EOK;
 }
 uint32_t GetDoorID(void)
@@ -252,7 +247,8 @@ void LoadDevice2Memory(void)//数据载入到内存中
         Global_Device.ID[i] = Flash_Get_Key_Value(i);
         LOG_D("GOT ID is %ld",Global_Device.ID[i]);
     }
-    Global_Device.DoorID = Flash_Get_Key_Value(99999999);
+    Global_Device.DoorID = Flash_Get_Key_Value(88888888);
+    Global_Device.LastFlag = Flash_Get_Key_Value(99999999);
 }
 MSH_CMD_EXPORT(LoadDevice2Memory,LoadDevice2Memory);
 void DeleteAllDevice(void)//数据载入到内存中
@@ -260,6 +256,9 @@ void DeleteAllDevice(void)//数据载入到内存中
     LOG_D("Before Delete num is %d",Global_Device.Num);
     memset(&Global_Device,0,sizeof(Global_Device));
     Flash_LearnNums_Change(0);
+    Flash_Key_Change(88888888,0);//DoorID
+    Flash_Key_Change(99999999,0);//LastFlag
     LOG_D("After Delete num is %d",Global_Device.Num);
+    rt_hw_cpu_reset();
 }
 MSH_CMD_EXPORT(DeleteAllDevice,DeleteAllDevice);
