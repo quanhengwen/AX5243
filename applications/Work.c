@@ -110,7 +110,7 @@ void WaterScan_Callback(void *parameter)
 }
 void WaterScan_Init(void)
 {
-    WaterScan_t = rt_thread_create("WaterScan", WaterScan_Callback, RT_NULL, 1004, 30, 5);
+    WaterScan_t = rt_thread_create("WaterScan", WaterScan_Callback, RT_NULL, 1004, 30, 10);
     if(WaterScan_t!=RT_NULL)rt_thread_startup(WaterScan_t);
 }
 void AliveIncrease(void)//心跳使counter增加

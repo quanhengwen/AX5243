@@ -84,6 +84,11 @@ void Stop_Learn(void)
     if(ValveStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
     LOG_D("Learn timer is stop\r\n");
 }
+void learn_test(void)
+{
+    Add_DoorDevice(30000001);
+}
+MSH_CMD_EXPORT(learn_test,learn_test);
 void Device_Learn(Message buf)
 {
     switch(buf.Data)

@@ -91,21 +91,24 @@ uint32_t Flash_Get_Key_Value(uint32_t key)
 }
 void Flash_Key_Change(uint32_t key,uint32_t value)
 {
-    char Temp_KeyBuf[10] = {0};
+    char *Temp_KeyBuf = rt_malloc(10);
     sprintf(Temp_KeyBuf, "%ld", key);
-    char Temp_ValueBuf[10] = {0};
+    char *Temp_ValueBuf = rt_malloc(10);//申请临时buffer空间
     sprintf(Temp_ValueBuf, "%ld", value);
     ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
     ef_save_env();
+    rt_free(Temp_KeyBuf);
+    rt_free(Temp_ValueBuf);
     LOG_D("Writing %ld to key %ld \r\n", value,key);
 }
 void Flash_LearnNums_Change(uint32_t value)
 {
     const char *keybuf="Learn_Nums";
-    char Temp_ValueBuf[10] = {0};
+    char *Temp_ValueBuf = rt_malloc(10);
     sprintf(Temp_ValueBuf, "%ld", value);
     ef_set_env(keybuf, Temp_ValueBuf);
     ef_save_env();
+    rt_free(Temp_ValueBuf);
     LOG_D("Writing %ld to key %s\r\n", value,keybuf);
 }
 uint8_t Add_Device(uint32_t Device_ID)
