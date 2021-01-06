@@ -53,7 +53,7 @@ void WarningWithPeak(uint8_t status)
         MasterLostPeakWarning();
         break;
     case 2://测水线短路
-        Moto_Close(NormalOff);
+        //Moto_Close(NormalOff);
         MasterWaterAlarmWarning();
         break;
     }
