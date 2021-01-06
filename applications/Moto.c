@@ -56,14 +56,21 @@ void Moto_Open(uint8_t ActFlag)
 }
 void Moto_Close(uint8_t ActFlag)
 {
-    LOG_D("Moto is Close\r\n");
-    Now_Status = Close;
-    led_Stop(1);//绿灯
-    ValveStatus=0;
-    Global_Device.LastFlag = ActFlag;
-    Flash_Key_Change(99999999,ActFlag);
-    rt_pin_mode(Moto,0);
-    rt_pin_write(Moto,0);
+    if(Global_Device.LastFlag != OtherOff )
+    {
+        LOG_D("Moto is Close\r\n");
+        Now_Status = Close;
+        led_Stop(1);//绿灯
+        ValveStatus=0;
+        Global_Device.LastFlag = ActFlag;
+        Flash_Key_Change(99999999,ActFlag);
+        rt_pin_mode(Moto,0);
+        rt_pin_write(Moto,0);
+    }
+    else
+    {
+        LOG_D("No permissions to Off\r\n");
+    }
 }
 void Turn1_Edge_Callback(void *parameter)
 {

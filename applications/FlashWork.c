@@ -131,12 +131,27 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
     Global_Device.ID[Num] = Device_ID;
     Flash_Key_Change(Num,Device_ID);
     Global_Device.DoorID = Num;
-    Flash_Key_Change(88888888,Global_Device.DoorID);
+    Flash_Key_Change(88888888,Num);
     return RT_EOK;
 }
 uint32_t GetDoorID(void)
 {
-    return Global_Device.ID[Global_Device.DoorID];
+    if(Global_Device.DoorID)
+    {
+        if(Global_Device.ID[Global_Device.DoorID])
+        {
+            return Global_Device.ID[Global_Device.DoorID];
+        }
+        else {
+            LOG_D("Not Include Door Device\r\n");
+            return 0;
+        }
+    }
+    else
+    {
+        LOG_D("Not Include Door Device ID\r\n");
+        return 0;
+    }
 }
 uint8_t Delete_Device(uint32_t Device_ID)
 {

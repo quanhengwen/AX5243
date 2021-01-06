@@ -31,11 +31,11 @@ typedef struct
 {
     uint8_t NowNum;
     uint8_t TargetNum;
-    uint8_t wor_flag[10];
-    uint32_t Taget_Id[10];
-    uint8_t counter[10];
-    uint8_t Command[10];
-    uint8_t Data[10];
+    uint8_t wor_flag[20];
+    uint32_t Taget_Id[20];
+    uint8_t counter[20];
+    uint8_t Command[20];
+    uint8_t Data[20];
 }Radio_Queue;
 
 Radio_Queue Main_Queue={0};
@@ -100,7 +100,7 @@ MSH_CMD_EXPORT(radio_test,radio_test);
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t NumTemp = Main_Queue.TargetNum;
-    if(NumTemp<10)
+    if(NumTemp<20)
     {
         NumTemp ++;
         LOG_D("Queue Num Increase,Value is %d\r\n",NumTemp);
@@ -156,7 +156,7 @@ void RadioDequeue(void *paramaeter)
                 case 0:
                     RadioSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
                     LOG_D("Normal Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    rt_thread_mdelay(500);
+                    rt_thread_mdelay(300);
                     break;
                 case 1:
                     WorSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
