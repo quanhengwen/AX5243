@@ -197,33 +197,38 @@ void DataSolve(Message buf)
             if(buf.Data==0)
             {
                 LOG_D("Warning With Command 4 Data 0\r\n");
-                if(GetDoorID()==buf.From_ID)
+                if(GetDoorID()==buf.From_ID)//是否为主控的回包
                 {
-
+                    LOG_D("RECV 40 From Door\r\n");
                 }
-                else
+                else//是否为来自终端的数据
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,0);
-                    RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
+                    if(GetDoorID())
+                    {
+                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
+                    }
                 }
             }
             else if(buf.Data==1)
             {
                 LOG_D("Warning With Command 4 Data 1\r\n");
-                if(GetDoorID()==buf.From_ID)
+                if(GetDoorID()==buf.From_ID)//是否为主控的回包
                 {
+                    LOG_D("RECV 41 From Door\r\n");
                 }
-                else
+                else//是否为来自终端的报警包
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,1);
                     if(Now_Status!=SlaverWaterAlarmActive)
                     {
-                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
+                        if(GetDoorID())
+                        {
+                            RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
+                        }
                         Enable_Warining();
                     }
-
                 }
-
             }
         }
         else
@@ -255,7 +260,7 @@ void DataSolve(Message buf)
         }
         break;
     case 6://关机
-        LOG_D("Pwr Off\r\n");
+        LOG_D("Pwr Off and Now State is %d\r\n",Now_Status);
         if(Check_Valid(buf.From_ID))
         {
             if(Now_Status==Open||Now_Status==Close)
@@ -271,6 +276,7 @@ void DataSolve(Message buf)
             {
                 LOG_D("Warning With Command 6\r\n");
                 Disable_Warining();
+                Moto_Close(OtherOff);
                 RadioEnqueue(0,buf.From_ID,buf.Counter,6,0);
             }
         }
@@ -281,6 +287,11 @@ void DataSolve(Message buf)
         break;
     }
 }
+void status_serach(void)
+{
+    LOG_D("Status is %d\r\n",Now_Status);
+}
+MSH_CMD_EXPORT(status_serach,status_serach);
 void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
 {
     Message Rx_message;

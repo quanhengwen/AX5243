@@ -18,5 +18,7 @@ void beep_start(uint8_t led_id,int mode);
 void beep_stop(void);
 void key_down(void);
 void just_ring(void);
+void beeplive(void);
+void beepback(void);
 
 #endif /* APPLICATIONS_LED_H_ */

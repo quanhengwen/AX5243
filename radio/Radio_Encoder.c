@@ -16,6 +16,7 @@
 #include "Radio_Config.h"
 #include "Radio.h"
 #include "Radio_Encoder.h"
+#include "led.h"
 #include <stdio.h>
 
 #define DBG_TAG "radio_encoder"
@@ -26,6 +27,8 @@ rt_thread_t Radio_QueueTask = RT_NULL;
 
 uint32_t Self_Id = 10010861;
 uint32_t Self_Counter = 0;
+
+uint8_t wor_sendflag=0;
 
 typedef struct
 {
@@ -42,6 +45,11 @@ Radio_Queue Main_Queue={0};
 
 void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
 {
+    if(wor_sendflag)
+    {
+        wor_sendflag=0;
+        beepback();
+    }
     LOG_D("Send ok\r\n");
 }
 void RadioSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
@@ -90,6 +98,8 @@ void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
     buf[29] = ((check&0xf) < 10)?  (check&0xf) + '0' : (check&0xf) - 10 + 'A';
     buf[30] = '\r';
     buf[31] = '\n';
+    beeplive();
+    wor_sendflag = 1;
     Wor_send(buf,32);
 }
 void radio_test(void)

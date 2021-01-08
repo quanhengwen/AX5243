@@ -11,6 +11,9 @@ static agile_led_t *beep = RT_NULL;
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+uint8_t led_id_temp = 0;
+uint8_t led_mode_temp = 0;
+
 void led_Init(void)
 {
     if(led0 == RT_NULL)
@@ -32,12 +35,23 @@ void led_Init(void)
     }
 
 }
+void beeplive(void)
+{
+    agile_led_stop(led0);
+    agile_led_on(led0);
+}
+void beepback(void)
+{
+    agile_led_off(led0);
+    agile_led_start(led0);
+}
 void beep_start(uint8_t led_id,int mode)
 {
+    led_id_temp = led_id;
+    led_mode_temp = mode;
     switch (mode)
     {
     case 0:
-
         if(led_id)//绿灯
         {
             agile_led_set_light_mode(beep, "200,200", 1);

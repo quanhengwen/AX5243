@@ -26,6 +26,11 @@ extern uint8_t ValveStatus;
 extern enum Device_Status Now_Status;
 extern Device_Info Global_Device;
 
+void motoread(void)
+{
+    LOG_D("Moto is %d\r\n",Global_Device.LastFlag);
+}
+MSH_CMD_EXPORT(motoread,motoread);
 void Moto_Open(uint8_t ActFlag)
 {
     if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOpen)
@@ -35,7 +40,7 @@ void Moto_Open(uint8_t ActFlag)
         led_Long_Start(1);//绿灯
         ValveStatus=1;
         Global_Device.LastFlag = ActFlag;
-        Flash_Key_Change(99999999,ActFlag);
+        Flash_Moto_Change(ActFlag);
         rt_pin_mode(Moto,0);
         rt_pin_write(Moto,1);
     }
@@ -46,7 +51,7 @@ void Moto_Open(uint8_t ActFlag)
         led_Long_Start(1);//绿灯
         ValveStatus=1;
         Global_Device.LastFlag = ActFlag;
-        Flash_Key_Change(99999999,ActFlag);
+        Flash_Moto_Change(ActFlag);
         rt_pin_mode(Moto,0);
         rt_pin_write(Moto,1);
     }
@@ -63,9 +68,14 @@ void Moto_Close(uint8_t ActFlag)
         led_Stop(1);//绿灯
         ValveStatus=0;
         Global_Device.LastFlag = ActFlag;
-        Flash_Key_Change(99999999,ActFlag);
+        Flash_Moto_Change(ActFlag);
         rt_pin_mode(Moto,0);
         rt_pin_write(Moto,0);
+    }
+    else if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOff)
+    {
+        Now_Status = Close;
+        LOG_D("Moto is alreay otheroff\r\n");
     }
     else
     {

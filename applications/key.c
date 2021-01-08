@@ -16,6 +16,7 @@
 #include "work.h"
 #include "status.h"
 #include "flashwork.h"
+#include "rthw.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -133,7 +134,9 @@ void Key_Reponse_Callback(void *parameter)
         else if(K0_K1_Status==RT_EOK)
         {
             DeleteAllDevice();
-            beep_start(0,8);//蜂鸣器三下
+            beep_start(0,8);//蜂鸣器5次
+            rt_thread_mdelay(2500);
+            rt_hw_cpu_reset();
         }
         else if(K1_Long_Status==RT_EOK)//OFF
         {

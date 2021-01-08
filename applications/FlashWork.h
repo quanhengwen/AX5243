@@ -12,10 +12,10 @@ typedef struct
     uint32_t ID_Time[50];
 }Device_Info;
 
-#define NormalOff 1<<0
-#define OtherOff 1<<1
-#define NormalOpen 1<<2
-#define OtherOpen 1<<3
+#define NormalOff   1
+#define OtherOff    2
+#define NormalOpen  3
+#define OtherOpen   4
 
 uint32_t Flash_Get(uint32_t id);
 uint8_t Flash_Get_Key_Valid(uint32_t key);
@@ -31,3 +31,5 @@ void LoadDevice2Memory(void);
 uint8_t Add_DoorDevice(uint32_t Device_ID);
 uint32_t GetDoorID(void);
 void DeleteAllDevice(void);//数据载入到内存中;
+void Flash_Moto_Change(uint8_t value);
+uint32_t Flash_Get_Moto_Flag(void);
