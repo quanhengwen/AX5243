@@ -33,6 +33,7 @@ void motoread(void)
 MSH_CMD_EXPORT(motoread,motoread);
 void Moto_Open(uint8_t ActFlag)
 {
+    LOG_D("Moto Open Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
     if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOpen)
     {
         LOG_D("Moto is Open\r\n");
@@ -61,6 +62,7 @@ void Moto_Open(uint8_t ActFlag)
 }
 void Moto_Close(uint8_t ActFlag)
 {
+    LOG_D("Moto Close Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
     if(Global_Device.LastFlag != OtherOff )
     {
         LOG_D("Moto is Close\r\n");

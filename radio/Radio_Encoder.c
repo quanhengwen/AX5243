@@ -102,11 +102,6 @@ void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
     wor_sendflag = 1;
     Wor_send(buf,32);
 }
-void radio_test(void)
-{
-    RadioSend(10010861,0,5,0);
-}
-MSH_CMD_EXPORT(radio_test,radio_test);
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t NumTemp = Main_Queue.TargetNum;
@@ -127,26 +122,6 @@ void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Co
     Main_Queue.TargetNum++;
     LOG_D("Enqueue Success\r\n");
 }
-void queuetest(void)
-{
-    RadioEnqueue(0,38000001,60,4,1);
-}
-MSH_CMD_EXPORT(queuetest,queuetest);
-void queuetest1(void)
-{
-    RadioEnqueue(0,38000001,62,4,0);
-}
-MSH_CMD_EXPORT(queuetest1,queuetest1);
-void queuetest2(void)
-{
-    RadioEnqueue(1,38000001,64,4,1);
-}
-MSH_CMD_EXPORT(queuetest2,queuetest2);
-void queuetest3(void)
-{
-    RadioEnqueue(1,38000001,64,4,0);
-}
-MSH_CMD_EXPORT(queuetest3,queuetest3);
 void RadioDequeue(void *paramaeter)
 {
     LOG_D("Queue Init Success\r\n");
@@ -171,7 +146,7 @@ void RadioDequeue(void *paramaeter)
                 case 1:
                     WorSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
                     LOG_D("Wor Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    rt_thread_mdelay(15000);
+                    rt_thread_mdelay(9000);
                     break;
                 }
                 LOG_D("Dequeue Success\r\n");

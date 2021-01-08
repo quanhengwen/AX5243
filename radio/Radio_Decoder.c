@@ -86,7 +86,8 @@ void Stop_Learn(void)
 }
 void learn_test(void)
 {
-    Add_DoorDevice(30000001);
+    Add_Device(20022636);
+    Add_DoorDevice(38000001);
 }
 MSH_CMD_EXPORT(learn_test,learn_test);
 void Device_Learn(Message buf)
@@ -243,9 +244,10 @@ void DataSolve(Message buf)
             if((Now_Status==Open||Now_Status==Close) && (Now_Status!=Offline))
             {
                 LOG_D("Pwr On From %ld\r\n",buf.From_ID);
-                Disable_Warining();
-                key_down();
+                //Disable_Warining();
+                just_ring();
                 Moto_Open(OtherOpen);
+                Last_Close_Flag=0;
                 RadioEnqueue(0,buf.From_ID,buf.Counter,5,1);
             }
             else

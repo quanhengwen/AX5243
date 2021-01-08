@@ -88,14 +88,14 @@ void BackToNormal(void)
     WaterScan_Clear();
     beep_stop();
     led_Stop(0);
-    led_Stop(1);
-    if(ValveStatus)
-    {
-        Moto_Open(NormalOpen);
-    }
-    else
-    {
-        Moto_Close(NormalOff);
-    }
+    //led_Stop(1);
+//    if(ValveStatus)
+//    {
+//        Moto_Open(NormalOpen);
+//    }
+//    else
+//    {
+//        Moto_Close(NormalOff);
+//    }
 }
 

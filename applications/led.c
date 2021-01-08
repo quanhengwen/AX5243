@@ -6,6 +6,8 @@
 static agile_led_t *led0 = RT_NULL;
 static agile_led_t *led1 = RT_NULL;
 static agile_led_t *beep = RT_NULL;
+static agile_led_t *singlebeep = RT_NULL;
+static agile_led_t *singleled0 = RT_NULL;
 
 #define DBG_TAG "led"
 #define DBG_LVL DBG_LOG
@@ -19,6 +21,7 @@ void led_Init(void)
     if(led0 == RT_NULL)
     {
         led0 = agile_led_create(LED0_PIN, PIN_LOW, "200,200", -1);
+        singleled0 = agile_led_create(LED0_PIN, PIN_LOW, "200,1", 1);
         LOG_D("LED_0 Init Success\r\n");
     }
 
@@ -31,6 +34,7 @@ void led_Init(void)
     if(beep == RT_NULL)
     {
         beep = agile_led_create(0, PIN_HIGH, "200,200", -1);
+        singlebeep = agile_led_create(0, PIN_HIGH, "200,1", 1);
         LOG_D("Beep Init Success\r\n");
     }
 
@@ -38,12 +42,15 @@ void led_Init(void)
 void beeplive(void)
 {
     agile_led_stop(led0);
+    agile_led_stop(singleled0);
     agile_led_on(led0);
 }
 void beepback(void)
 {
     agile_led_off(led0);
     agile_led_start(led0);
+    agile_led_stop(beep);
+    agile_led_start(beep);
 }
 void beep_start(uint8_t led_id,int mode)
 {
@@ -204,11 +211,6 @@ void beep_start(uint8_t led_id,int mode)
         break;
     }
 }
-void led_test(void)
-{
-    beep_start(0,0);
-}
-MSH_CMD_EXPORT(led_test,led_test);
 void beep_stop(void)
 {
     rt_pin_write(0, 0);
@@ -216,20 +218,18 @@ void beep_stop(void)
 }
 void key_down(void)
 {
-    //rt_thread_mdelay(10);
-    agile_led_stop(beep);
-    agile_led_stop(led0);
-    agile_led_set_light_mode(beep, "200,200", 1);
-    agile_led_set_light_mode(led0, "200,200", 1);
-    //led_Stop(0);
-    //led_Stop(2);
-    agile_led_start(beep);
-    agile_led_start(led0);
+//    agile_led_stop(beep);
+//    agile_led_stop(led0);
+//    agile_led_set_light_mode(beep, "200,200", 1);
+//    agile_led_set_light_mode(led0, "200,200", 1);
+//    agile_led_start(beep);
+//    agile_led_start(led0);
+    agile_led_start(singlebeep);
+    agile_led_start(singleled0);
 }
 void just_ring(void)
 {
-    agile_led_set_light_mode(beep, "200,200", 1);
-    agile_led_start(beep);
+    agile_led_start(singlebeep);
 }
 void led_Long_Start(uint8_t led_id)
 {
@@ -291,7 +291,6 @@ void led_Stop(uint8_t led_id)
         agile_led_stop(led0);
         rt_pin_write(LED0_PIN, 1);
         break;
-
     case 1:
         agile_led_stop(led1);
         rt_pin_write(LED1_PIN, 1);

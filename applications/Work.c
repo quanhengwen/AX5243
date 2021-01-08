@@ -44,7 +44,7 @@ void WarningWithPeak(uint8_t status)
     switch(status)
     {
     case 0://恢复正常
-        //if(ValvePastStatus)Moto_Open();else Moto_Close();
+        if(ValvePastStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
         BackToNormal();
         break;
     case 1://测水线掉落

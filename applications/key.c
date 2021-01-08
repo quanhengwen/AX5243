@@ -98,8 +98,15 @@ void Key_Reponse_Callback(void *parameter)
             switch(Now_Status)
             {
             case Close:
-                key_down();
-                Last_Close_Flag = 0;
+                if(Last_Close_Flag==0)
+                {
+                    key_down();
+                }
+                else
+                {
+                    beep_start(0,7);//蜂鸣器三下
+                }
+                //Last_Close_Flag = 0;
                 LOG_D("Valve Already Close With OFF\r\n");
                 break;
             case Open:
