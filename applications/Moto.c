@@ -125,7 +125,7 @@ void Moto_Init(void)
     Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5100, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     Moto_Timer2 = rt_timer_create("Moto_Timer2", Turn2_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     just_ring();
-    if(Global_Device.LastFlag==NormalOpen || Global_Device.LastFlag==OtherOpen)
+    if(Global_Device.LastFlag != OtherOff)
     {
         Moto_Open(Global_Device.LastFlag);
     }

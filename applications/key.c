@@ -60,7 +60,7 @@ void Key_Reponse_Callback(void *parameter)
             case Close:
                 if(Last_Close_Flag==0)
                 {
-                    key_down();
+                    just_ring();
                     Moto_Open(NormalOpen);
                 }
                 else
@@ -121,8 +121,9 @@ void Key_Reponse_Callback(void *parameter)
                 break;
             case MasterLostPeak:
                 key_down();
+                Moto_Close(NormalOff);
+                beep_stop();
                 Now_Status = Close;
-                Disable_Warining();//消警
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:

@@ -43,8 +43,7 @@ void SlaverWaterAlarmWarning(void)
 MSH_CMD_EXPORT(SlaverWaterAlarmWarning,SlaverWaterAlarmWarning);
 void MasterLostPeakWarning(void)
 {
-    //Moto_Close();
-    beep_start(0,1);//红灯,蜂鸣器二下
+    loss_led_start();
     Now_Status = MasterLostPeak;
     LOG_D("MasterLostPeakWarning\r\n");
 }
@@ -88,14 +87,5 @@ void BackToNormal(void)
     WaterScan_Clear();
     beep_stop();
     led_Stop(0);
-    //led_Stop(1);
-//    if(ValveStatus)
-//    {
-//        Moto_Open(NormalOpen);
-//    }
-//    else
-//    {
-//        Moto_Close(NormalOff);
-//    }
 }
 

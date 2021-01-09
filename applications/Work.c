@@ -44,16 +44,13 @@ void WarningWithPeak(uint8_t status)
     switch(status)
     {
     case 0://恢复正常
-        if(ValvePastStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
         BackToNormal();
+        loss_led_start();
         break;
     case 1://测水线掉落
-        ValvePastStatus = ValveStatus;
-        //Moto_Close();
         MasterLostPeakWarning();
         break;
     case 2://测水线短路
-        //Moto_Close(NormalOff);
         MasterWaterAlarmWarning();
         break;
     }

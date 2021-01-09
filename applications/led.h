@@ -20,5 +20,7 @@ void key_down(void);
 void just_ring(void);
 void beeplive(void);
 void beepback(void);
+void loss_led_start(void);
+void loss_led_stop(void);
 
 #endif /* APPLICATIONS_LED_H_ */

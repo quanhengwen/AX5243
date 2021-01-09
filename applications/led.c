@@ -8,6 +8,7 @@ static agile_led_t *led1 = RT_NULL;
 static agile_led_t *beep = RT_NULL;
 static agile_led_t *singlebeep = RT_NULL;
 static agile_led_t *singleled0 = RT_NULL;
+static agile_led_t *lossled0 = RT_NULL;
 
 #define DBG_TAG "led"
 #define DBG_LVL DBG_LOG
@@ -22,6 +23,7 @@ void led_Init(void)
     {
         led0 = agile_led_create(LED0_PIN, PIN_LOW, "200,200", -1);
         singleled0 = agile_led_create(LED0_PIN, PIN_LOW, "200,1", 1);
+        lossled0 = agile_led_create(LED0_PIN, PIN_LOW, "200,200,200,5000", -1);
         LOG_D("LED_0 Init Success\r\n");
     }
 
@@ -41,16 +43,22 @@ void led_Init(void)
 }
 void beeplive(void)
 {
-    agile_led_stop(led0);
-    agile_led_stop(singleled0);
-    agile_led_on(led0);
+    //agile_led_start(longled0);
+    agile_led_lock(led0);
+    rt_pin_write(LED0_PIN,0);
 }
 void beepback(void)
 {
-    agile_led_off(led0);
-    agile_led_start(led0);
-    agile_led_stop(beep);
-    agile_led_start(beep);
+    agile_led_lock(led0);
+    //agile_led_stop(longled0);
+}
+void loss_led_start(void)
+{
+    agile_led_start(lossled0);
+}
+void loss_led_stop(void)
+{
+    agile_led_stop(lossled0);
 }
 void beep_start(uint8_t led_id,int mode)
 {
