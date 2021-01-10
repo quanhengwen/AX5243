@@ -57,6 +57,7 @@ void Moto_Open(uint8_t ActFlag)
         rt_pin_write(Moto,1);
     }
     else {
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("No permissions to Open\r\n");
     }
 }
@@ -77,10 +78,12 @@ void Moto_Close(uint8_t ActFlag)
     else if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOff)
     {
         Now_Status = Close;
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("Moto is alreay otheroff\r\n");
     }
     else
     {
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("No permissions to Off\r\n");
     }
 }

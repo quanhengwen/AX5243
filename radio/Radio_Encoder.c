@@ -122,6 +122,7 @@ void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Co
     Main_Queue.TargetNum++;
     LOG_D("Enqueue Success\r\n");
 }
+//uint8_t Wor_Rcv_Flag
 void RadioDequeue(void *paramaeter)
 {
     LOG_D("Queue Init Success\r\n");
@@ -135,6 +136,7 @@ void RadioDequeue(void *paramaeter)
                 Main_Queue.TargetNum = 0;
             }
             else {
+//                if()
                 Main_Queue.NowNum++;
                 switch(Main_Queue.wor_flag[Main_Queue.NowNum])
                 {

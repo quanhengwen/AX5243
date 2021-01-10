@@ -127,9 +127,9 @@ void Key_Reponse_Callback(void *parameter)
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:
+                key_down();
                 Now_Status = Close;
                 Disable_Warining();//消警
-                key_down();
                 MasterAlarmWaterDisable();
                 LOG_D("MasterWaterAlarmActive With OFF\r\n");
                 break;

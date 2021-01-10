@@ -45,7 +45,8 @@ void WarningWithPeak(uint8_t status)
     {
     case 0://恢复正常
         BackToNormal();
-        loss_led_start();
+        beep_stop();
+        loss_led_stop();
         break;
     case 1://测水线掉落
         MasterLostPeakWarning();

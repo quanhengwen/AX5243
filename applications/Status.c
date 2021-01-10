@@ -43,6 +43,7 @@ void SlaverWaterAlarmWarning(void)
 MSH_CMD_EXPORT(SlaverWaterAlarmWarning,SlaverWaterAlarmWarning);
 void MasterLostPeakWarning(void)
 {
+    beep_start(0,1);//红灯,蜂鸣器三下
     loss_led_start();
     Now_Status = MasterLostPeak;
     LOG_D("MasterLostPeakWarning\r\n");

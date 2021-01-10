@@ -43,14 +43,19 @@ void led_Init(void)
 }
 void beeplive(void)
 {
-    //agile_led_start(longled0);
     agile_led_lock(led0);
+    agile_led_lock(singleled0);
+    agile_led_lock(lossled0);
+    LOG_D("Led 0 is Lock\r\n");
     rt_pin_write(LED0_PIN,0);
 }
 void beepback(void)
 {
-    agile_led_lock(led0);
-    //agile_led_stop(longled0);
+    agile_led_unlock(led0);
+    agile_led_unlock(singleled0);
+    agile_led_unlock(lossled0);
+    rt_pin_write(LED0_PIN,1);
+    LOG_D("Led 0 is UnLock\r\n");
 }
 void loss_led_start(void)
 {
