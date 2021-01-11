@@ -23,8 +23,8 @@
 #include <rtdbg.h>
 
 
-uint8_t WarningStatus=0;
-uint8_t WarningStatus_Temp=0;
+uint8_t WarningNowStatus=0;
+uint8_t WarningPastStatus=0;
 uint8_t ValvePastStatus=0;
 rt_thread_t WaterScan_t=RT_NULL;
 extern uint8_t ValveStatus;
@@ -58,8 +58,8 @@ void WarningWithPeak(uint8_t status)
 }
 void WaterScan_Clear(void)
 {
-    WarningStatus=0;
-    WarningStatus_Temp=0;
+    WarningPastStatus=0;
+    WarningNowStatus=0;
 }
 void WaterScan_Callback(void *parameter)
 {
@@ -75,31 +75,35 @@ void WaterScan_Callback(void *parameter)
         Peak_Loss_Level = rt_pin_read(Peak_Loss);
         if(Peak_Loss_Level!=0)
         {
-            WarningStatus_Temp=1;//测水线掉落
+            WarningNowStatus=1;//测水线掉落
             LOG_D("Peak_Loss is active\r\n");
         }
         else
         {
             if(Peak_ON_Level==0)
             {
-                WarningStatus_Temp=2;//测水线短路
+                WarningNowStatus=2;//测水线短路
                 LOG_D("Peak_ON is active\r\n");
             }
-            else WarningStatus_Temp=0;//状态正常
+            else WarningNowStatus=0;//状态正常
         }
-        if(WarningStatus_Temp!=WarningStatus)
+        if(WarningNowStatus != WarningPastStatus)
         {
-            if(WarningStatus_Temp==0&&WarningStatus==2)
+            if(WarningPastStatus==2 && WarningNowStatus==0)
             {
-                WarningStatus = WarningStatus_Temp;
-                //MasterAlarmWaterDisable();
-                LOG_D("Warning But Not Reponse\r\n");
+                WarningPastStatus = WarningNowStatus;
+                LOG_D("Short down But Not Warning not off\r\n");
+            }
+            else if(WarningPastStatus==2 && WarningNowStatus==1)
+            {
+                WarningPastStatus = WarningNowStatus;
+                LOG_D("Water Loss But Short Down Warning is not change Now\r\n");
             }
             else
             {
-                WarningStatus = WarningStatus_Temp;
+                WarningPastStatus = WarningNowStatus;
                 LOG_D("Warning\r\n");
-                WarningWithPeak(WarningStatus);
+                WarningWithPeak(WarningNowStatus);
                 //执行警报触发程序
             }
         }
