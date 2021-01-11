@@ -179,6 +179,23 @@ uint8_t Delete_Device(uint32_t Device_ID)
     Flash_Key_Change(Num,Device_ID);
     return RT_EOK;
 }
+uint8_t Update_Device_Bat(uint32_t Device_ID,uint8_t bat)//更新电量
+{
+    uint16_t num = Global_Device.Num;
+    if(!num)return RT_ERROR;
+    while(num)
+    {
+        if(Global_Device.ID[num]==Device_ID)
+        {
+            Global_Device.Bat[num] = bat;
+            LOG_D("Device Bat %d is Increase to %d",Global_Device.ID[num],bat);
+            return RT_EOK;
+        }
+        num--;
+    }
+    LOG_D("Device %d is Not Increase Success",Global_Device.ID[num]);
+    return RT_ERROR;
+}
 uint8_t Update_Device_Time(uint32_t Device_ID,uint32_t TimeCount)//更新时间戳
 {
     uint16_t num = Global_Device.Num;
@@ -247,7 +264,7 @@ void Detect_All_Time(void)
         if(Global_Device.ID_Time[num]>=24)
         {
             //掉线ID上报
-            OfflineWarning();
+            Warning_Enable_Num(5);
             LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
         }
         num--;

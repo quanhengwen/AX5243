@@ -297,10 +297,7 @@ void agile_led_toggle(agile_led_t *led)
 void agile_led_on(agile_led_t *led)
 {
     RT_ASSERT(led);
-    if(led->lock == 0)
-    {
-        rt_pin_write(led->pin, led->active_logic);
-    }
+     rt_pin_write(led->pin, led->active_logic);
 }
 
 /**
@@ -312,22 +309,21 @@ void agile_led_on(agile_led_t *led)
 */
 void agile_led_off(agile_led_t *led)
 {
-    RT_ASSERT(led);\
-    if(led->lock == 0)
-    {
-        rt_pin_write(led->pin, !led->active_logic);
-    }
+    RT_ASSERT(led);
+    rt_pin_write(led->pin, !led->active_logic);
 }
 
 void agile_led_lock(agile_led_t *led)
 {
     RT_ASSERT(led);
-    led->lock = 1;
+    led->lock = led->pin;
+    led->pin = 12;
 }
 
 void agile_led_unlock(agile_led_t *led)
 {
     RT_ASSERT(led);
+    led->pin =led->lock ;
     led->lock = 0;
 }
 /**

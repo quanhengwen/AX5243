@@ -52,6 +52,7 @@ uint8_t Check_Valid(uint32_t From_id)
     if(Flash_Get_Key_Valid(From_id)==1)return 0;
     else return 1;
 }
+
 void Start_Learn_Key(void)
 {
     Now_Status = Learn;
@@ -129,6 +130,7 @@ void Device_Learn(Message buf)
             else//存在该值
             {
                 LOG_D("Include This Device，Send Confirmed\r\n");
+                just_ring();    //响一声
                 RadioEnqueue(0,buf.From_ID,buf.Counter,3,2);
             }
         }
@@ -164,13 +166,13 @@ void DataSolve(Message buf)
             if(buf.Data==2)
             {
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
-                SlaverLowBatteryWarning();
+                Warning_Enable_Num(1);
             }
             else
             {
+                Update_Device_Bat(buf.From_ID,buf.Data);//写入电量
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
                 Disable_Warining();
-                //Moto_Open();
             }
             LOG_D("Handshake With %ld\r\n",buf.From_ID);
         }

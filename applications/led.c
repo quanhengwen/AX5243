@@ -78,7 +78,6 @@ void beep_start(uint8_t led_id,int mode)
             agile_led_start(beep);
             agile_led_set_light_mode(led1, "200,200", 1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else//红灯
         {
@@ -86,7 +85,6 @@ void beep_start(uint8_t led_id,int mode)
             agile_led_start(beep);
             agile_led_set_light_mode(led0, "200,15000", -1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
 
@@ -97,13 +95,11 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200,200,5000", -1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_set_light_mode(led0, "200,200,200,5000", -1);
             agile_led_start(led0);
-            //led_Stop(1);
         }
         break;
 
@@ -114,13 +110,11 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200,200,200,200,5000", -1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_set_light_mode(led0, "200,200,200,200,200,5000", -1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 3:
@@ -130,13 +124,11 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 4:
@@ -146,13 +138,11 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 5://四声
@@ -162,13 +152,11 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 6:
@@ -178,14 +166,12 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200", 1);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_stop(led0);
             agile_led_set_light_mode(led0, "200,200", 1);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 7:
@@ -195,14 +181,12 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200", 3);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_stop(led0);
             agile_led_set_light_mode(led0, "200,200", 3);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     case 8:
@@ -212,31 +196,23 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_set_light_mode(led1, "200,200", 5);
             agile_led_start(led1);
-            led_Stop(0);
         }
         else
         {
             agile_led_stop(led0);
             agile_led_set_light_mode(led0, "200,200", 5);
             agile_led_start(led0);
-            led_Stop(1);
         }
         break;
     }
 }
 void beep_stop(void)
 {
-    rt_pin_write(0, 0);
     agile_led_stop(beep);
+    rt_pin_write(0, 0);
 }
 void key_down(void)
 {
-//    agile_led_stop(beep);
-//    agile_led_stop(led0);
-//    agile_led_set_light_mode(beep, "200,200", 1);
-//    agile_led_set_light_mode(led0, "200,200", 1);
-//    agile_led_start(beep);
-//    agile_led_start(led0);
     agile_led_start(singlebeep);
     agile_led_start(singleled0);
 }

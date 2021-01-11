@@ -25,6 +25,7 @@
 
 uint8_t WarningNowStatus=0;
 uint8_t WarningPastStatus=0;
+uint8_t WarningStatus=0;
 uint8_t ValvePastStatus=0;
 rt_thread_t WaterScan_t=RT_NULL;
 extern uint8_t ValveStatus;
@@ -36,7 +37,7 @@ void Disable_Warining(void)
 }
 void Enable_Warining(void)
 {
-    SlaverWaterAlarmWarning();
+    Warning_Enable_Num(2);
     LOG_D("Warning is Open\r\n");
 }
 void WarningWithPeak(uint8_t status)
@@ -49,10 +50,15 @@ void WarningWithPeak(uint8_t status)
         loss_led_stop();
         break;
     case 1://测水线掉落
-        MasterLostPeakWarning();
+        beep_start(0,1);//红灯,蜂鸣器三下
+        loss_led_start();
+        LOG_D("MasterLostPeakWarning\r\n");
         break;
     case 2://测水线短路
-        MasterWaterAlarmWarning();
+        Warning_Enable_Num(4);
+        break;
+    case 3://测水线短路解除
+        MasterStatusChangeToDeAvtive();
         break;
     }
 }
@@ -60,6 +66,7 @@ void WaterScan_Clear(void)
 {
     WarningPastStatus=0;
     WarningNowStatus=0;
+    WarningStatus = 0;
 }
 void WaterScan_Callback(void *parameter)
 {
@@ -91,20 +98,46 @@ void WaterScan_Callback(void *parameter)
         {
             if(WarningPastStatus==2 && WarningNowStatus==0)
             {
-                WarningPastStatus = WarningNowStatus;
-                LOG_D("Short down But Not Warning not off\r\n");
+                if(WarningStatus != 1<<0)
+                {
+                    WarningStatus = 1<<0;
+                    WarningWithPeak(3);
+                    LOG_D("Change Status to Deactive\r\n");
+                }
             }
             else if(WarningPastStatus==2 && WarningNowStatus==1)
             {
-                WarningPastStatus = WarningNowStatus;
-                LOG_D("Water Loss But Short Down Warning is not change Now\r\n");
+                if(WarningStatus != 1<<1)
+                {
+                    WarningStatus = 1<<1;
+                }
             }
-            else
+            else if(WarningPastStatus==0 && WarningNowStatus==1)
             {
-                WarningPastStatus = WarningNowStatus;
-                LOG_D("Warning\r\n");
-                WarningWithPeak(WarningNowStatus);
-                //执行警报触发程序
+                if(WarningStatus != 1<<2)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<2;
+                    WarningWithPeak(1);
+                }
+            }
+            else if(WarningPastStatus==0 && WarningNowStatus==2)
+            {
+                if(WarningStatus != 1<<3)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<3;
+                    WarningWithPeak(2);
+                }
+            }
+            else if(WarningPastStatus==1 && WarningNowStatus==0)
+            {
+                if(WarningStatus != 1<<4)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<4;
+                    WarningWithPeak(0);
+                }
             }
         }
         rt_thread_mdelay(500);
