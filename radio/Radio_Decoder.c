@@ -150,6 +150,7 @@ void Device_Learn(Message buf)
 
 void DataSolve(Message buf)
 {
+    Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
     switch(buf.Command)
     {
     case 1://测试模拟报警（RESET）

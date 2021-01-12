@@ -115,8 +115,8 @@ void MasterStatusChangeToDeAvtive(void)
 }
 void MasterWaterAlarmWarning(void *parameter)
 {
-    beep_start(0,2);//红灯,蜂鸣器三下
     Moto_Close(NormalOff);
+    beep_start(0,2);//红灯,蜂鸣器三下
     if(GetDoorID())
     {
         RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,1);
