@@ -90,14 +90,14 @@ void Warning_Disable(void)
 }
 void SlaverLowBatteryWarning(void *parameter)
 {
-    Moto_Close(NormalOff);
+    Moto_Close(OtherOff);
     beep_start(0,0);//红灯,蜂鸣器一下
     Now_Status = SlaverLowPower;
     LOG_D("SlaverLowBatteryWarning\r\n");
 }
 void SlaverWaterAlarmWarning(void *parameter)
 {
-    //Moto_Close(NormalOff);
+    Moto_Close(OtherOff);
     beep_start(0,2);//红灯,蜂鸣器三下
     Now_Status = SlaverWaterAlarmActive;
     LOG_D("SlaverWaterAlarmWarning\r\n");
@@ -106,7 +106,6 @@ void MasterLostPeakWarning(void *parameter)
 {
     beep_start(0,1);//红灯,蜂鸣器三下
     loss_led_start();
-    //Now_Status = MasterLostPeak;
     LOG_D("MasterLostPeakWarning\r\n");
 }
 void MasterStatusChangeToDeAvtive(void)

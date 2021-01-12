@@ -137,16 +137,30 @@ uint8_t Add_Device(uint32_t Device_ID)
 uint8_t Add_DoorDevice(uint32_t Device_ID)
 {
     uint32_t Num=0;
-    Num = Flash_Get_Learn_Nums();
-    if(Num>30)return RT_ERROR;
-    Num++;
-    Flash_LearnNums_Change(Num);
-    Global_Device.Num = Num;
-    Global_Device.ID[Num] = Device_ID;
-    Flash_Key_Change(Num,Device_ID);
-    Global_Device.DoorID = Num;
-    Flash_Key_Change(88888888,Num);
-    return RT_EOK;
+    if(GetDoorID())
+    {
+        Num = Flash_Get_Learn_Nums();
+        Global_Device.ID[Num] = Device_ID;
+        Flash_Key_Change(Num,Device_ID);
+        Global_Device.DoorID = Num;
+        Flash_Key_Change(88888888,Num);
+        LOG_D("Replace Learn\r\n");
+        return RT_EOK;
+    }
+    else
+    {
+        Num = Flash_Get_Learn_Nums();
+        if(Num>30)return RT_ERROR;
+        Num++;
+        Flash_LearnNums_Change(Num);
+        Global_Device.Num = Num;
+        Global_Device.ID[Num] = Device_ID;
+        Flash_Key_Change(Num,Device_ID);
+        Global_Device.DoorID = Num;
+        Flash_Key_Change(88888888,Num);
+        LOG_D("New Learn\r\n");
+        return RT_EOK;
+    }
 }
 uint32_t GetDoorID(void)
 {
