@@ -131,18 +131,58 @@ void MasterAlarmWaterDisable(void)
         RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,0);
     }
 }
+void KidLock_Enable(void)
+{
+    if(GetDoorID())
+    {
+        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,1);
+        LOG_D("Try to Open KidLock\r\n");
+    }
+    else
+    {
+        LOG_D("No Door Device\r\n");
+    }
+}
+MSH_CMD_EXPORT(KidLock_Enable,KidLock_Enable);
+void KidLock_Disable(void)
+{
+    if(GetDoorID())
+    {
+        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,0);
+        LOG_D("Try to Close KidLock\r\n");
+    }
+    else
+    {
+        LOG_D("No Door Device\r\n");
+    }
+}
+MSH_CMD_EXPORT(KidLock_Disable,KidLock_Disable);
 void OfflineWarning(void *parameter)
 {
     if(Now_Status!=Offline)
     {
-        Moto_Close(NormalOff);
-        beep_start(0,5);
         Now_Status = Offline;
+        Moto_Close(NormalOff);
+        led_Stop(4);
+        beep_start(0,5);
         LOG_D("OfflineWarning\r\n");
     }
     else
     {
         LOG_D("Already OfflineWarning Now\r\n");
+    }
+
+}
+void OfflineDisableWarning(void)
+{
+    if(Now_Status == Offline)
+    {
+        Warning_Disable();
+        LOG_D("Disable OfflineWarning\r\n");
+    }
+    else
+    {
+        LOG_D("Not OfflineWarning Now\r\n");
     }
 
 }

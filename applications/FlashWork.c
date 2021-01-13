@@ -18,7 +18,6 @@ typedef struct _env_list {
     char *key;
 } env_list;
 
-
 Device_Info Global_Device={0};
 void Boot_Times_Record(void)
 {
@@ -210,23 +209,6 @@ uint8_t Update_Device_Bat(uint32_t Device_ID,uint8_t bat)//更新电量
     LOG_D("Device %d is Not Increase Success",Global_Device.ID[num]);
     return RT_ERROR;
 }
-uint8_t Update_Device_Time(uint32_t Device_ID,uint32_t TimeCount)//更新时间戳
-{
-    uint16_t num = Global_Device.Num;
-    if(!num)return RT_ERROR;
-    while(num)
-    {
-        if(Global_Device.ID[num]==Device_ID)
-        {
-            Global_Device.ID_Time[num] += 1;
-            LOG_D("Device %d is Increase to %d",Global_Device.ID[num],TimeCount);
-            return RT_EOK;
-        }
-        num--;
-    }
-    LOG_D("Device %d is Not Increase Success",Global_Device.ID[num]);
-    return RT_ERROR;
-}
 uint8_t Clear_Device_Time(uint32_t Device_ID)//更新时间戳为0
 {
     uint16_t num = Global_Device.Num;
@@ -253,7 +235,7 @@ void Update_All_Time(void)
     for(uint8_t i=1;i<=Num;i++)
     {
         Time = Global_Device.ID_Time[i];//查询剩余时间
-        Time++;                         //自增
+        if(Time<25)Time++;                     //自增
         Global_Device.ID_Time[i] = Time;//更新内存中的时间
         LOG_D("Device ID %ld With Time is Update to %d\r\n",Global_Device.ID[i],Global_Device.ID_Time[i]);
     }
@@ -262,27 +244,42 @@ void Update_All_Time(void)
 void Clear_All_Time(void)
 {
     uint16_t Num = Global_Device.Num;
-    if(!Num)return;
-    for(uint8_t i=0;i<=Num;i++)
+    if(Num)
     {
-        Global_Device.ID_Time[i] = 0;//更新内存中的时间
+        for(uint8_t i=1;i<=Num;i++)
+        {
+            if(Global_Device.ID_Time[i]<25)
+            {
+                Global_Device.ID_Time[i] = 0;//更新内存中的时间
+                LOG_D("Device %ld's time is cleard",Global_Device.ID[i]);
+            }
+        }
+        LOG_D("Clear_All_Time OK\r\n");
     }
-    LOG_D("Clear_All_Time OK\r\n");
 }
 void Detect_All_Time(void)
 {
     uint16_t num = Global_Device.Num;
+    uint8_t WarnFlag = 0;
     if(!num)return;
     while(num)
     {
-        if(Global_Device.ID_Time[num]>=24)
+        if(Global_Device.ID_Time[num]>24)
         {
+            WarnFlag = 1;
             //掉线ID上报
-            Warning_Enable_Num(5);
-            LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
+            if(Global_Device.ID[num] == Global_Device.DoorID)
+            {
+                LOG_D("Door is Offline\r\n");
+            }
+            else
+            {
+                LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
+            }
         }
         num--;
     }
+    if(WarnFlag)Warning_Enable_Num(5);
     Clear_All_Time();
     LOG_D("Detect_All_Time OK\r\n");
 }
@@ -297,6 +294,39 @@ uint8_t Flash_Get_Key_Valid(uint32_t Device_ID)//查询内存中的ID
     }
     return RT_ERROR;
 }
+void Detect_All_TimeInDecoder(uint8_t ID)
+{
+    if(Flash_Get_Key_Valid(ID)==0)
+    {
+        Clear_Device_Time(ID);
+    }
+    uint16_t num = Global_Device.Num;
+    uint8_t WarnFlag = 0;
+    if(!num)return;
+    while(num)
+    {
+        if(Global_Device.ID_Time[num]>25)
+        {
+            WarnFlag = 1;
+            //掉线ID上报
+            if(Global_Device.ID[num] == Global_Device.DoorID)
+            {
+                LOG_D("Door is Offline\r\n");
+            }
+            else
+            {
+                LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
+            }
+        }
+        num--;
+    }
+    if(WarnFlag==0)
+    {
+        OfflineDisableWarning();
+    }
+    LOG_D("Detect_All_Time OK\r\n");
+}
+
 void LoadDevice2Memory(void)//数据载入到内存中
 {
     memset(&Global_Device,0,sizeof(Global_Device));

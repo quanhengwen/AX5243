@@ -25,7 +25,7 @@ void RTC_Timer_Entry(void)
     LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
     if(RTC_Counter==4||RTC_Counter==9||RTC_Counter==14||RTC_Counter==19||RTC_Counter==24)
     {
-        Moto_Detect();
+        //Moto_Detect();
     }
     if(RTC_Counter<24)
     {
@@ -36,6 +36,7 @@ void RTC_Timer_Entry(void)
     else
     {
         LOG_D("RTC Handler Detect\r\n");
+        Update_All_Time();//24小时更新全部时间
         Detect_All_Time();//25个小时检测计数器
         RTC_Counter=0;
     }

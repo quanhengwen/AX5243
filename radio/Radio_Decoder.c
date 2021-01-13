@@ -41,6 +41,7 @@ typedef struct
 uint8_t Learn_Flag=0;
 uint8_t Last_Close_Flag=0;
 uint16_t Radio_Counter=0;
+uint8_t KidLock=0;
 
 extern rt_timer_t Learn_Timer;
 extern uint8_t ValveStatus ;
@@ -150,7 +151,6 @@ void Device_Learn(Message buf)
 
 void DataSolve(Message buf)
 {
-    Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
     switch(buf.Command)
     {
     case 1://测试模拟报警（RESET）
@@ -173,7 +173,7 @@ void DataSolve(Message buf)
             {
                 Update_Device_Bat(buf.From_ID,buf.Data);//写入电量
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
-                Disable_Warining();
+                //Disable_Warining();
             }
             LOG_D("Handshake With %ld\r\n",buf.From_ID);
         }
@@ -290,7 +290,24 @@ void DataSolve(Message buf)
             LOG_D("Not Include This Device\r\n");
         }
         break;
+    case 7://童锁
+        LOG_D("Kid Lock!\r\n");
+        if(Check_Valid(buf.From_ID))
+        {
+            if(GetDoorID()==buf.From_ID)//是否为主控的回包
+            {
+                LOG_D("RECV KidLock 7%d From Door\r\n",buf.Data);
+                KidLock = buf.Data;
+            }
+        }
+        else
+        {
+            LOG_D("Not Include This Device\r\n");
+        }
+        break;
     }
+    Detect_All_TimeInDecoder(buf.From_ID);
+    Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
 }
 void status_serach(void)
 {
