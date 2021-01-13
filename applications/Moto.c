@@ -57,6 +57,7 @@ void Moto_Open(uint8_t ActFlag)
         rt_pin_write(Moto,1);
     }
     else {
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("No permissions to Open\r\n");
     }
 }
@@ -77,10 +78,12 @@ void Moto_Close(uint8_t ActFlag)
     else if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOff)
     {
         Now_Status = Close;
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("Moto is alreay otheroff\r\n");
     }
     else
     {
+        beep_start(0,7);//蜂鸣器三下
         LOG_D("No permissions to Off\r\n");
     }
 }
@@ -125,7 +128,7 @@ void Moto_Init(void)
     Moto_Timer1 = rt_timer_create("Moto_Timer1", Turn1_Timer_Callback, RT_NULL, 5100, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     Moto_Timer2 = rt_timer_create("Moto_Timer2", Turn2_Timer_Callback, RT_NULL, 5000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
     just_ring();
-    if(Global_Device.LastFlag==NormalOpen || Global_Device.LastFlag==OtherOpen)
+    if(Global_Device.LastFlag != OtherOff)
     {
         Moto_Open(Global_Device.LastFlag);
     }

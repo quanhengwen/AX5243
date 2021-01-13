@@ -13,6 +13,7 @@ typedef struct agile_led agile_led_t;
 struct agile_led
 {
     uint8_t active;                                  // 激活标志
+    uint8_t lock;                                    // 激活标志
     rt_base_t pin;                                   // 控制引脚
     rt_base_t active_logic;                          // 有效电平(PIN_HIGH/PIN_LOW)
     uint32_t *light_arr;                             // 闪烁数组
@@ -43,6 +44,10 @@ void agile_led_toggle(agile_led_t *led);
 void agile_led_on(agile_led_t *led);
 // led对象灭
 void agile_led_off(agile_led_t *led);
+
+void agile_led_lock(agile_led_t *led);
+
+void agile_led_unlock(agile_led_t *led);
 
 #ifdef __cplusplus
 }

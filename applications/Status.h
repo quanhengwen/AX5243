@@ -9,12 +9,19 @@
  */
 #ifndef APPLICATIONS_STATUS_H_
 #define APPLICATIONS_STATUS_H_
-void SlaverLowBatteryWarning(void);
-void SlaverWaterAlarmWarning(void);
-void MasterLostPeakWarning(void);
-void MasterWaterAlarmWarning(void);
+void WarningInit(void);
 void BackToNormal(void);
-void OfflineWarning(void);
+void Warning_Disable(void);
+void Warning_Enable_Num(uint8_t id);
 void MasterAlarmWaterDisable(void);
+void MasterStatusChangeToDeAvtive(void);
+void OfflineDisableWarning(void);
+//void SlaverLowBatteryWarning(void);
+//void SlaverWaterAlarmWarning(void);
+//void MasterLostPeakWarning(void);
+//void MasterWaterAlarmWarning(void);
+//void BackToNormal(void);
+//void OfflineWarning(void);
+//void MasterAlarmWaterDisable(void);
 
 #endif /* APPLICATIONS_STATUS_H_ */

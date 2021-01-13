@@ -122,6 +122,7 @@ agile_led_t *agile_led_create(rt_base_t pin, rt_base_t active_logic, const char 
     led->light_arr = RT_NULL;
     led->arr_num = 0;
     led->arr_index = 0;
+    led->lock = 0;
     if (light_mode)
     {
         if (agile_led_get_light_arr(led, light_mode) < 0)
@@ -296,7 +297,7 @@ void agile_led_toggle(agile_led_t *led)
 void agile_led_on(agile_led_t *led)
 {
     RT_ASSERT(led);
-    rt_pin_write(led->pin, led->active_logic);
+     rt_pin_write(led->pin, led->active_logic);
 }
 
 /**
@@ -312,6 +313,19 @@ void agile_led_off(agile_led_t *led)
     rt_pin_write(led->pin, !led->active_logic);
 }
 
+void agile_led_lock(agile_led_t *led)
+{
+    RT_ASSERT(led);
+    led->lock = led->pin;
+    led->pin = 12;
+}
+
+void agile_led_unlock(agile_led_t *led)
+{
+    RT_ASSERT(led);
+    led->pin =led->lock ;
+    led->lock = 0;
+}
 /**
 * Name:             led_process
 * Brief:            agile_led线程

@@ -23,8 +23,9 @@
 #include <rtdbg.h>
 
 
+uint8_t WarningNowStatus=0;
+uint8_t WarningPastStatus=0;
 uint8_t WarningStatus=0;
-uint8_t WarningStatus_Temp=0;
 uint8_t ValvePastStatus=0;
 rt_thread_t WaterScan_t=RT_NULL;
 extern uint8_t ValveStatus;
@@ -36,7 +37,7 @@ void Disable_Warining(void)
 }
 void Enable_Warining(void)
 {
-    SlaverWaterAlarmWarning();
+    Warning_Enable_Num(2);
     LOG_D("Warning is Open\r\n");
 }
 void WarningWithPeak(uint8_t status)
@@ -44,24 +45,28 @@ void WarningWithPeak(uint8_t status)
     switch(status)
     {
     case 0://恢复正常
-        if(ValvePastStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
         BackToNormal();
+        beep_stop();
+        loss_led_stop();
         break;
     case 1://测水线掉落
-        ValvePastStatus = ValveStatus;
-        //Moto_Close();
-        MasterLostPeakWarning();
+        beep_start(0,1);//红灯,蜂鸣器三下
+        loss_led_start();
+        LOG_D("MasterLostPeakWarning\r\n");
         break;
     case 2://测水线短路
-        //Moto_Close(NormalOff);
-        MasterWaterAlarmWarning();
+        Warning_Enable_Num(4);
+        break;
+    case 3://测水线短路解除
+        MasterStatusChangeToDeAvtive();
         break;
     }
 }
 void WaterScan_Clear(void)
 {
-    WarningStatus=0;
-    WarningStatus_Temp=0;
+    WarningPastStatus=0;
+    WarningNowStatus=0;
+    WarningStatus = 0;
 }
 void WaterScan_Callback(void *parameter)
 {
@@ -77,32 +82,62 @@ void WaterScan_Callback(void *parameter)
         Peak_Loss_Level = rt_pin_read(Peak_Loss);
         if(Peak_Loss_Level!=0)
         {
-            WarningStatus_Temp=1;//测水线掉落
+            WarningNowStatus=1;//测水线掉落
             LOG_D("Peak_Loss is active\r\n");
         }
         else
         {
             if(Peak_ON_Level==0)
             {
-                WarningStatus_Temp=2;//测水线短路
+                WarningNowStatus=2;//测水线短路
                 LOG_D("Peak_ON is active\r\n");
             }
-            else WarningStatus_Temp=0;//状态正常
+            else WarningNowStatus=0;//状态正常
         }
-        if(WarningStatus_Temp!=WarningStatus)
+        if(WarningNowStatus != WarningPastStatus)
         {
-            if(WarningStatus_Temp==0&&WarningStatus==2)
+            if(WarningPastStatus==2 && WarningNowStatus==0)
             {
-                WarningStatus = WarningStatus_Temp;
-                //MasterAlarmWaterDisable();
-                LOG_D("Warning But Not Reponse\r\n");
+                if(WarningStatus != 1<<0)
+                {
+                    WarningStatus = 1<<0;
+                    WarningWithPeak(3);
+                    LOG_D("Change Status to Deactive\r\n");
+                }
             }
-            else
+            else if(WarningPastStatus==2 && WarningNowStatus==1)
             {
-                WarningStatus = WarningStatus_Temp;
-                LOG_D("Warning\r\n");
-                WarningWithPeak(WarningStatus);
-                //执行警报触发程序
+                if(WarningStatus != 1<<1)
+                {
+                    WarningStatus = 1<<1;
+                }
+            }
+            else if(WarningPastStatus==0 && WarningNowStatus==1)
+            {
+                if(WarningStatus != 1<<2)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<2;
+                    WarningWithPeak(1);
+                }
+            }
+            else if(WarningPastStatus==0 && WarningNowStatus==2)
+            {
+                if(WarningStatus != 1<<3)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<3;
+                    WarningWithPeak(2);
+                }
+            }
+            else if(WarningPastStatus==1 && WarningNowStatus==0)
+            {
+                if(WarningStatus != 1<<4)
+                {
+                    WarningPastStatus = WarningNowStatus;
+                    WarningStatus = 1<<4;
+                    WarningWithPeak(0);
+                }
             }
         }
         rt_thread_mdelay(500);

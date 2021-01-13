@@ -41,6 +41,7 @@ typedef struct
 uint8_t Learn_Flag=0;
 uint8_t Last_Close_Flag=0;
 uint16_t Radio_Counter=0;
+uint8_t KidLock=0;
 
 extern rt_timer_t Learn_Timer;
 extern uint8_t ValveStatus ;
@@ -52,6 +53,7 @@ uint8_t Check_Valid(uint32_t From_id)
     if(Flash_Get_Key_Valid(From_id)==1)return 0;
     else return 1;
 }
+
 void Start_Learn_Key(void)
 {
     Now_Status = Learn;
@@ -129,6 +131,7 @@ void Device_Learn(Message buf)
             else//存在该值
             {
                 LOG_D("Include This Device，Send Confirmed\r\n");
+                just_ring();    //响一声
                 RadioEnqueue(0,buf.From_ID,buf.Counter,3,2);
             }
         }
@@ -164,13 +167,13 @@ void DataSolve(Message buf)
             if(buf.Data==2)
             {
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
-                SlaverLowBatteryWarning();
+                Warning_Enable_Num(1);
             }
             else
             {
+                Update_Device_Bat(buf.From_ID,buf.Data);//写入电量
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
-                Disable_Warining();
-                //Moto_Open();
+                //Disable_Warining();
             }
             LOG_D("Handshake With %ld\r\n",buf.From_ID);
         }
@@ -287,7 +290,24 @@ void DataSolve(Message buf)
             LOG_D("Not Include This Device\r\n");
         }
         break;
+    case 7://童锁
+        LOG_D("Kid Lock!\r\n");
+        if(Check_Valid(buf.From_ID))
+        {
+            if(GetDoorID()==buf.From_ID)//是否为主控的回包
+            {
+                LOG_D("RECV KidLock 7%d From Door\r\n",buf.Data);
+                KidLock = buf.Data;
+            }
+        }
+        else
+        {
+            LOG_D("Not Include This Device\r\n");
+        }
+        break;
     }
+    Detect_All_TimeInDecoder(buf.From_ID);
+    Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
 }
 void status_serach(void)
 {

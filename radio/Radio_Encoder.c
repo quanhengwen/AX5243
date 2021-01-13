@@ -28,7 +28,16 @@ rt_thread_t Radio_QueueTask = RT_NULL;
 uint32_t Self_Id = 10010861;
 uint32_t Self_Counter = 0;
 
-uint8_t wor_sendflag=0;
+typedef struct
+{
+    uint32_t TargetID;
+    uint8_t Command;
+    uint8_t Data;
+    uint8_t CorrectFlag;
+    uint8_t SendFlag;
+    uint8_t WarningFlag;
+    uint8_t WaitCheckFlag;
+}Reponse;
 
 typedef struct
 {
@@ -42,12 +51,26 @@ typedef struct
 }Radio_Queue;
 
 Radio_Queue Main_Queue={0};
+Reponse WorCheck={0};
+
+void Check_Wor_Recv(uint32_t From_ID,uint8_t Command,uint8_t Data)
+{
+    if(WorCheck.TargetID == From_ID && WorCheck.Command == Command && WorCheck.Data == Data)
+    {
+        LOG_D("Wor Recv Verify OK\r\n");
+        WorCheck.CorrectFlag = 1;
+    }
+    else
+    {
+        LOG_D("Wor Recv Verify Fail\r\n");
+    }
+}
 
 void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
 {
-    if(wor_sendflag)
+    if(WorCheck.SendFlag)
     {
-        wor_sendflag=0;
+        WorCheck.SendFlag = 0;
         beepback();
     }
     LOG_D("Send ok\r\n");
@@ -76,14 +99,15 @@ void RadioSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
     buf[31] = '\n';
     Normal_send(buf,32);
 }
+uint8_t SendBuf[35];
 void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t check = 0;
-    uint8_t buf[35];
+
     if(counter<255)counter++;
     else counter=0;
-
-    sprintf((char *)(buf),"{%08ld,%08ld,%03d,%02d,%d}",\
+    memset(SendBuf,0,sizeof(SendBuf));
+    sprintf((char *)(SendBuf),"{%08ld,%08ld,%03d,%02d,%d}",\
                                             Taget_Id,\
                                             Self_Id,\
                                             counter,\
@@ -92,15 +116,27 @@ void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 
     for(uint8_t i = 0 ; i < 28 ; i ++)
     {
-        check += buf[i];
+        check += SendBuf[i];
     }
-    buf[28] = ((check>>4) < 10)?  (check>>4) + '0' : (check>>4) - 10 + 'A';
-    buf[29] = ((check&0xf) < 10)?  (check&0xf) + '0' : (check&0xf) - 10 + 'A';
-    buf[30] = '\r';
-    buf[31] = '\n';
+    SendBuf[28] = ((check>>4) < 10)?  (check>>4) + '0' : (check>>4) - 10 + 'A';
+    SendBuf[29] = ((check&0xf) < 10)?  (check&0xf) + '0' : (check&0xf) - 10 + 'A';
+    SendBuf[30] = '\r';
+    SendBuf[31] = '\n';
     beeplive();
-    wor_sendflag = 1;
-    Wor_send(buf,32);
+    WorCheck.SendFlag = 1;
+    WorCheck.TargetID = Taget_Id;
+    WorCheck.Command = Command;
+    WorCheck.Data = Data;
+    WorCheck.CorrectFlag = 0;
+    WorCheck.WarningFlag = 0;
+    WorCheck.WaitCheckFlag = 1;
+    Wor_send(SendBuf,32);
+}
+void SendWithOldBuff(void)
+{
+    beeplive();
+    WorCheck.SendFlag = 1;
+    Wor_send(SendBuf,32);
 }
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
@@ -127,30 +163,48 @@ void RadioDequeue(void *paramaeter)
     LOG_D("Queue Init Success\r\n");
     while(1)
     {
-        if(Main_Queue.TargetNum>0)
+        if(WorCheck.WaitCheckFlag == 1 && WorCheck.WarningFlag<2)
         {
-            if(Main_Queue.NowNum >= Main_Queue.TargetNum)
+            if(WorCheck.CorrectFlag==0 )
             {
-                Main_Queue.NowNum = 0;
-                Main_Queue.TargetNum = 0;
+                SendWithOldBuff();
+                LOG_D("WorCheck Fail.CorrectFlag is %d,WarningFlag is %d\r\n",WorCheck.CorrectFlag,WorCheck.WarningFlag);
+                WorCheck.WarningFlag++;
+                rt_thread_mdelay(9000);
             }
-            else {
-                Main_Queue.NowNum++;
-                switch(Main_Queue.wor_flag[Main_Queue.NowNum])
-                {
-                case 0:
-                    RadioSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    LOG_D("Normal Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    rt_thread_mdelay(300);
-                    break;
-                case 1:
-                    WorSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    LOG_D("Wor Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                    rt_thread_mdelay(9000);
-                    break;
-                }
-                LOG_D("Dequeue Success\r\n");
+            else
+            {
+                WorCheck.WaitCheckFlag = 0;
+                LOG_D("WorCheck Success.CorrectFlag is %d,WarningFlag is %d\r\n",WorCheck.CorrectFlag,WorCheck.WarningFlag);
             }
+        }
+        else
+        {
+            WorCheck.WaitCheckFlag = 0;
+        }
+
+        if(Main_Queue.NowNum == Main_Queue.TargetNum)
+        {
+            Main_Queue.NowNum = 0;
+            Main_Queue.TargetNum = 0;
+        }
+        else if(Main_Queue.TargetNum>0 && WorCheck.WaitCheckFlag!=1)
+        {
+            Main_Queue.NowNum++;
+            switch(Main_Queue.wor_flag[Main_Queue.NowNum])
+            {
+            case 0:
+                RadioSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
+                LOG_D("Normal Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
+                rt_thread_mdelay(300);
+                break;
+            case 1:
+                WorSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
+                LOG_D("Wor Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
+                rt_thread_mdelay(9000);
+                break;
+            }
+            LOG_D("Dequeue Success\r\n");
         }
         rt_thread_mdelay(10);
     }

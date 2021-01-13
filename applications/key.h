@@ -17,10 +17,10 @@ enum Device_Status
     SlaverWaterAlarmActive,
     MasterLostPeak,
     MasterWaterAlarmActive,
+    MasterWaterAlarmDeActive,
     Learn,
     Offline
 };
-
 void Key_Reponse(void);
 
 

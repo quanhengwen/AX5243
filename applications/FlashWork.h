@@ -10,6 +10,7 @@ typedef struct
     uint32_t DoorID;
     uint32_t ID[50];
     uint32_t ID_Time[50];
+    uint8_t  Bat[50];
 }Device_Info;
 
 #define NormalOff   1
@@ -33,3 +34,5 @@ uint32_t GetDoorID(void);
 void DeleteAllDevice(void);//数据载入到内存中;
 void Flash_Moto_Change(uint8_t value);
 uint32_t Flash_Get_Moto_Flag(void);
+uint8_t Update_Device_Bat(uint32_t Device_ID,uint8_t bat);
+void Detect_All_TimeInDecoder(uint8_t ID);

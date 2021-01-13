@@ -23,6 +23,7 @@
 #include "wifi-uart.h"
 #include "moto.h"
 #include "RTCWork.h"
+#include "status.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -34,6 +35,7 @@ int main(void)
     easyflash_init();
     Boot_Times_Record();
     LoadDevice2Memory();
+    WarningInit();
     led_Init();
     Moto_Init();
     button_Init();

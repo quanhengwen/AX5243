@@ -1169,7 +1169,6 @@ static void TransmitData(void)
 {
     unsigned char ubFreeCnt;
     unsigned char ubi;
-    //uint16_t axradio_txbuffer_cnt = 28832;
     for (;;)
     {
         ubFreeCnt = SpiReadSingleAddressRegister(REG_AX5043_FIFOFREE0); //uint8_t cnt = AX5043_FIFOFREE0;

@@ -17,6 +17,7 @@
 #include "status.h"
 #include "flashwork.h"
 #include "rthw.h"
+#include "status.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -60,7 +61,7 @@ void Key_Reponse_Callback(void *parameter)
             case Close:
                 if(Last_Close_Flag==0)
                 {
-                    key_down();
+                    just_ring();
                     Moto_Open(NormalOpen);
                 }
                 else
@@ -84,6 +85,9 @@ void Key_Reponse_Callback(void *parameter)
                 LOG_D("MasterLostPeak With ON\r\n");
                 break;
             case MasterWaterAlarmActive:
+                beep_start(0,2);//红灯,蜂鸣器三下
+                break;
+            case MasterWaterAlarmDeActive:
                 beep_start(0,2);
                 LOG_D("MasterWaterAlarmActive With ON\r\n");
                 break;
@@ -106,7 +110,6 @@ void Key_Reponse_Callback(void *parameter)
                 {
                     beep_start(0,7);//蜂鸣器三下
                 }
-                //Last_Close_Flag = 0;
                 LOG_D("Valve Already Close With OFF\r\n");
                 break;
             case Open:
@@ -118,17 +121,22 @@ void Key_Reponse_Callback(void *parameter)
             case SlaverLowPower:
                 break;
             case SlaverWaterAlarmActive:
+                beep_stop();
                 break;
             case MasterLostPeak:
                 key_down();
+                Moto_Close(NormalOff);
+                beep_stop();
                 Now_Status = Close;
-                Disable_Warining();//消警
                 LOG_D("MasterLostPeak With OFF\r\n");
                 break;
             case MasterWaterAlarmActive:
-                Now_Status = Close;
-                Disable_Warining();//消警
+                beep_stop();
+                break;
+            case MasterWaterAlarmDeActive:
                 key_down();
+                Now_Status = Close;
+                Warning_Disable();
                 MasterAlarmWaterDisable();
                 LOG_D("MasterWaterAlarmActive With OFF\r\n");
                 break;
