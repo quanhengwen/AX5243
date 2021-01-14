@@ -21,6 +21,8 @@
 #include "pin_config.h"
 #include "Radio_Decoder.h"
 #include "Radio_Encoder.h"
+#include "led.h"
+#include "status.h"
 
 #define DBG_TAG "radio"
 #define DBG_LVL DBG_LOG
@@ -1413,21 +1415,24 @@ void Radio_Task_Callback(void *parameter)
         }
     }
 }
-void xtal_off(void)
+rt_timer_t Init_Timer = RT_NULL;
+uint8_t InitFlag = 0;
+void Init_Timer_Callback(void *parameter)
 {
-    rt_pin_write(XTAL_PWR,0);
+    if(!InitFlag)
+    {
+        LOG_D("Radio Init Fail\r\n");
+        RadioInitFail();
+    }
 }
-MSH_CMD_EXPORT(xtal_off,xtal_off);
 void Radio_Task_Init(void)
 {
     Radio_IRQ_Sem = rt_sem_create("Radio_IRQ", 0, RT_IPC_FLAG_FIFO);
-    Radio_Task = rt_thread_create("Radio_Task", Radio_Task_Callback, RT_NULL, 4096, 10, 10);\
-    if(Radio_Task!=RT_NULL)rt_thread_startup(Radio_Task);
-    if (InitAX5043() != AXRADIO_ERR_NOERROR)
-    {
-        LOG_D("Radio Init Fail\r\n");
-        while(1);
-    }
+    Radio_Task = rt_thread_create("Radio_Task", Radio_Task_Callback, RT_NULL, 4096, 10, 10);
+    Init_Timer = rt_timer_create("Init_Timer", Init_Timer_Callback, RT_NULL, 3000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
+    if(Radio_Task!=RT_NULL)rt_thread_startup(Radio_Task);rt_timer_start(Init_Timer);
+    InitAX5043();
+    InitFlag = 1;
     LOG_D("Radio Init success\r\n");
     SetReceiveMode();           //接收模式
     AX5043ReceiverON();         //接收开启

@@ -25,7 +25,7 @@
 
 rt_thread_t Radio_QueueTask = RT_NULL;
 
-uint32_t Self_Id = 10010861;
+uint32_t Self_Id = 12021114;
 uint32_t Self_Counter = 0;
 
 typedef struct

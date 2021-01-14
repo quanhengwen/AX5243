@@ -17,6 +17,7 @@
 #include "Moto.h"
 #include "work.h"
 #include "string.h"
+#include "rthw.h"
 
 #define DBG_TAG "status"
 #define DBG_LVL DBG_LOG
@@ -185,6 +186,10 @@ void OfflineDisableWarning(void)
         LOG_D("Not OfflineWarning Now\r\n");
     }
 
+}
+void RadioInitFail(void)
+{
+    rt_hw_cpu_reset();
 }
 void WarningInit(void)
 {

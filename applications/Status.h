@@ -16,6 +16,7 @@ void Warning_Enable_Num(uint8_t id);
 void MasterAlarmWaterDisable(void);
 void MasterStatusChangeToDeAvtive(void);
 void OfflineDisableWarning(void);
+void RadioInitFail(void);
 //void SlaverLowBatteryWarning(void);
 //void SlaverWaterAlarmWarning(void);
 //void MasterLostPeakWarning(void);
