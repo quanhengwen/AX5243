@@ -125,7 +125,7 @@ uint8_t Add_Device(uint32_t Device_ID)
 {
     uint32_t Num=0;
     Num = Flash_Get_Learn_Nums();
-    if(Num>30)return RT_ERROR;
+    if(Num>200)return RT_ERROR;
     Num++;
     Flash_LearnNums_Change(Num);
     Global_Device.Num = Num;
@@ -149,7 +149,7 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
     else
     {
         Num = Flash_Get_Learn_Nums();
-        if(Num>30)return RT_ERROR;
+        if(Num>200)return RT_ERROR;
         Num++;
         Flash_LearnNums_Change(Num);
         Global_Device.Num = Num;

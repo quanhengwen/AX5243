@@ -8,9 +8,9 @@ typedef struct
     uint8_t  LastFlag;
     uint32_t Num;
     uint32_t DoorID;
-    uint32_t ID[50];
-    uint32_t ID_Time[50];
-    uint8_t  Bat[50];
+    uint32_t ID[210];
+    uint32_t ID_Time[210];
+    uint8_t  Bat[210];
 }Device_Info;
 
 #define NormalOff   1

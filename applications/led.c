@@ -295,6 +295,9 @@ void led_Stop(uint8_t led_id)
         rt_pin_write(0, 0);
         break;
     case 4:
+        agile_led_stop(led0);
+        agile_led_stop(led1);
+        agile_led_stop(beep);
         agile_led_stop(singlebeep);
         agile_led_stop(singleled0);
         break;

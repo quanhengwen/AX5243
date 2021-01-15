@@ -6,41 +6,43 @@
 #include "Flashwork.h"
 #include "moto.h"
 
-rt_timer_t RTC_Timer=RT_NULL;
-rt_thread_t RTC_Task=RT_NULL;
-rt_thread_t RTC_Check_Thread=RT_NULL;
-rt_sem_t RTC_Sem = RT_NULL;
-rt_sem_t RTC_Check_Sem = RT_NULL;
-RTC_HandleTypeDef RtcHandle;
-
-uint8_t RTC_Event_Flag = 0;
-
 #define DBG_TAG "RTC"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
 uint8_t RTC_Counter=0;
-void RTC_Timer_Entry(void)
-{
-    LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
-    if(RTC_Counter==4||RTC_Counter==9||RTC_Counter==14||RTC_Counter==19||RTC_Counter==24)
-    {
-        //Moto_Detect();
-    }
-    if(RTC_Counter<24)
-    {
-        LOG_D("RTC Handler Increase\r\n");
-        Update_All_Time();//24小时更新全部时间
-        RTC_Counter++;
-    }
-    else
-    {
-        LOG_D("RTC Handler Detect\r\n");
-        Update_All_Time();//24小时更新全部时间
-        Detect_All_Time();//25个小时检测计数器
-        RTC_Counter=0;
-    }
 
+rt_sem_t RTC_IRQ_Sem;
+rt_thread_t RTC_Scan = RT_NULL;
+RTC_HandleTypeDef RtcHandle;
+void RTC_Timer_Entry(void *parameter)
+{
+    while(1)
+    {
+        static rt_err_t result;
+        result = rt_sem_take(RTC_IRQ_Sem, RT_WAITING_FOREVER);
+        if (result == RT_EOK)
+        {
+            LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
+            if(RTC_Counter==4||RTC_Counter==9||RTC_Counter==14||RTC_Counter==19||RTC_Counter==24)
+            {
+                //Moto_Detect();
+            }
+            if(RTC_Counter<24)
+            {
+                LOG_D("RTC Handler Increase\r\n");
+                Update_All_Time();//24小时更新全部时间
+                RTC_Counter++;
+            }
+            else
+            {
+                LOG_D("RTC Handler Detect\r\n");
+                Update_All_Time();//24小时更新全部时间
+                Detect_All_Time();//25个小时检测计数器
+                RTC_Counter=0;
+            }
+        }
+    }
 }
 void RTC_TimeShow(void)
 {
@@ -58,7 +60,7 @@ void RTC_TimeShow(void)
       rt_thread_mdelay(1000);
   }
 }
-
+MSH_CMD_EXPORT(RTC_TimeShow,RTC_TimeShow);
 void RTC_AlarmConfig(void)
 {
     RTC_DateTypeDef  sdatestructure;
@@ -95,7 +97,7 @@ void RTC_AlarmConfig(void)
     salarmstructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
     salarmstructure.AlarmTime.Hours = 0;
     salarmstructure.AlarmTime.Minutes = 0;
-    salarmstructure.AlarmTime.Seconds = 3;
+    salarmstructure.AlarmTime.Seconds = 1;
     salarmstructure.AlarmTime.SubSeconds = 0;
 
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BIN) == HAL_OK)
@@ -114,7 +116,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *RtcHandle)
     sTime.StoreOperation = RTC_STOREOPERATION_RESET;
     HAL_RTC_SetTime(RtcHandle, &sTime, RTC_FORMAT_BIN);
 
-    RTC_Timer_Entry();
+    rt_sem_release(RTC_IRQ_Sem);
 }
 void RTC_Init(void)
 {
@@ -122,6 +124,16 @@ void RTC_Init(void)
     HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 
+    RTC_IRQ_Sem = rt_sem_create("RTC_IRQ", 0, RT_IPC_FLAG_FIFO);
+    RTC_Scan = rt_thread_create("RTC_Scan", RTC_Timer_Entry, RT_NULL, 1024, 5, 5);
+    if(RTC_Scan!=RT_NULL)
+    {
+        rt_thread_startup(RTC_Scan);
+    }
+    else
+    {
+        LOG_D("RTC Init Fail\r\n");
+    }
     RtcHandle.Instance = RTC;
     RtcHandle.Init.HourFormat = RTC_HOURFORMAT_24;
     RtcHandle.Init.AsynchPrediv = 127;
@@ -133,7 +145,7 @@ void RTC_Init(void)
     {
     }
     RTC_AlarmConfig();
-    LOG_D("RTC Init is Success\r\n");
+    LOG_D("RTC Init Success\r\n");
 }
 MSH_CMD_EXPORT(RTC_Init,RTC_Init);
 void RTC_Alarm_IRQHandler(void)

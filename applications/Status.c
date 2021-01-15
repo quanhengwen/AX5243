@@ -80,7 +80,6 @@ void Warning_Enable_Num(uint8_t id)
     case 5:Warning_Enable(OfflineEvent);break;
     case 6:Warning_Enable(MotoFailEvent);break;
     }
-
 }
 void Warning_Disable(void)
 {
@@ -164,15 +163,13 @@ void OfflineWarning(void *parameter)
     {
         Now_Status = Offline;
         Moto_Close(NormalOff);
-        led_Stop(4);
-        beep_start(0,5);
         LOG_D("OfflineWarning\r\n");
+        beep_start(0,5);
     }
     else
     {
         LOG_D("Already OfflineWarning Now\r\n");
     }
-
 }
 void OfflineDisableWarning(void)
 {
@@ -185,7 +182,6 @@ void OfflineDisableWarning(void)
     {
         LOG_D("Not OfflineWarning Now\r\n");
     }
-
 }
 void RadioInitFail(void)
 {
