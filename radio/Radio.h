@@ -15,32 +15,32 @@
 #include "rtthread.h"
 
 #define CHANNEL_NUM	1
-extern unsigned char ubReceiveFlag;
+extern uint8_t ubReceiveFlag;
 
 void SpiPowerDown(void);
 void AX5043_OFF(void);
 void Receive_ISR(void *parameter);
-void SpiWriteByte(unsigned char ubByte);
-void SpiWriteWord(unsigned int ubByte);
-unsigned char SpiReadByte(void);
-void SpiWriteSingleAddressRegister(unsigned char Addr, unsigned char Data);
-void SpiWriteLongAddressRegister(unsigned int Addr, unsigned char Data);
-unsigned char SpiReadSingleAddressRegister(unsigned char Addr);  
-unsigned char SpiReadLongAddressRegister(unsigned int Addr);
-void RF_CommonPWRMODE(unsigned char ubCom);
+void SpiWriteByte(uint8_t ubByte);
+void SpiWriteWord(uint16_t ubByte);
+uint8_t SpiReadByte(void);
+void SpiWriteSingleAddressRegister(uint8_t Addr, uint8_t Data);
+void SpiWriteLongAddressRegister(uint16_t Addr, uint8_t Data);
+uint8_t SpiReadSingleAddressRegister(uint8_t Addr);
+uint8_t SpiReadLongAddressRegister(uint16_t Addr);
+void RF_CommonPWRMODE(uint8_t ubCom);
 void InitAx5043REG(void);
 void AX5043_Reset(void);
-unsigned char InitAX5043(void);
+uint8_t InitAX5043(void);
+void ChangeWorFreq(void);
+void BackNormalFreq(void);
 
 void RdioWaitXtal(void);
-char SetChannel(unsigned char ubNum );
+char SetChannel(uint8_t ubNum );
 
-//#ifdef MASTER
 void SetTransmitMode(void);
 void transmit_packet(void);
 void ReceiveData(void);
 void enable_wor(void);
-//#else
 void AX5043ReceiverON(void);
 void SetReceiveMode(void);
 void RdioXtalON(void);

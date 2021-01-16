@@ -10,7 +10,6 @@
 /***********************************************************************/
 // TX: fcarrier=433.000MHz dev=  3.333kHz br= 10.000kBit/s pwr= 15.0dBm
 // RX: fcarrier=433.000MHz bw= 15.000kHz br= 10.000kBit/s
-
 #define XTAL_FREQ   26000000
 #define XTAL_FREQ_1     26
 #define CHANNEL_BW      100

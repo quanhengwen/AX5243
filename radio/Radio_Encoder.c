@@ -71,6 +71,7 @@ void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
     if(WorCheck.SendFlag)
     {
         WorCheck.SendFlag = 0;
+        BackNormalFreq();
         beepback();
     }
     LOG_D("Send ok\r\n");
