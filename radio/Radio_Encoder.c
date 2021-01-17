@@ -25,7 +25,8 @@
 
 rt_thread_t Radio_QueueTask = RT_NULL;
 
-uint32_t Self_Id = 12021114;
+uint32_t Self_Id = 0;
+uint32_t Self_Default_Id = 10000001;
 uint32_t Self_Counter = 0;
 
 typedef struct
@@ -212,6 +213,10 @@ void RadioDequeue(void *paramaeter)
 }
 void RadioDequeueTaskInit(void)
 {
+    int *p;
+    p=(int *)(0x0803FFFC);//这就是已知的地址，要强制类型转换
+    Self_Id = *p;//从Flash加载ID
+    if(Self_Id==0xFFFFFFFF)Self_Id = Self_Default_Id;
     Radio_QueueTask = rt_thread_create("Radio_QueueTask", RadioDequeue, RT_NULL, 1024, 10, 10);
     if(Radio_QueueTask)rt_thread_startup(Radio_QueueTask);
 }

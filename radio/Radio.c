@@ -56,13 +56,13 @@ uint8_t wor_flag=0;
 #define axradio_phy_preamble_flags 0x38
 #define axradio_phy_preamble_byte 0x55
 
+uint8_t ubReceiveFlag;
 uint8_t axradio_freq_select = 1;
 uint8_t axradio_freq_now = 1;
 uint32_t axradio_txbuffer_cnt = 0;
 uint32_t axradio_phy_chanfreq[2] = {0x10b62763,0x10b81f83};//434.5,434.7
 
-
-uint8_t ubReceiveFlag;
+extern uint32_t Self_Id;
 
 const uint16_t RegisterVaule[][2]=
 {
@@ -1364,10 +1364,10 @@ void Radio_Task_Init(void)
     if(Radio_Task!=RT_NULL)rt_thread_startup(Radio_Task);rt_timer_start(Init_Timer);
     InitAX5043();
     InitFlag = 1;
-    LOG_D("Radio Init success\r\n");
     SetReceiveMode();           //接收模式
     AX5043ReceiverON();         //接收开启
     readirq();
     RadioDequeueTaskInit();
+    LOG_D("Radio Init success,Self ID is %ld\r\n",Self_Id);
 }
 /********************************the end of file***********************/

@@ -92,6 +92,7 @@
 #define RT_USING_I2C
 #define RT_USING_PIN
 #define RT_USING_SPI
+#define RT_USING_WDT
 
 /* Using USB */
 

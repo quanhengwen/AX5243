@@ -24,6 +24,7 @@
 #include "moto.h"
 #include "RTCWork.h"
 #include "status.h"
+#include "dog.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -42,10 +43,12 @@ int main(void)
     WaterScan_Init();
     Key_Reponse();
     Radio_Task_Init();
+    wdt_sample();
     //RTC_Init();
-    WiFi_Init();
+    //WiFi_Init();
     while (1)
     {
+        FeedDog();
         rt_thread_mdelay(1000);
     }
     return RT_EOK;
