@@ -11,6 +11,7 @@
 #include <rtdbg.h>
 
 uint8_t RTC_Counter=0;
+uint32_t RTC_Hours = 0;
 
 rt_sem_t RTC_IRQ_Sem;
 rt_thread_t RTC_Scan = RT_NULL;
@@ -24,9 +25,9 @@ void RTC_Timer_Entry(void *parameter)
         if (result == RT_EOK)
         {
             LOG_D("RTC Handler Callback,Counter is %d\r\n",RTC_Counter);
-            if(RTC_Counter==4||RTC_Counter==9||RTC_Counter==14||RTC_Counter==19||RTC_Counter==24)
+            if(RTC_Hours%120==0)
             {
-                //Moto_Detect();
+                Moto_Detect();
             }
             if(RTC_Counter<24)
             {
@@ -95,9 +96,9 @@ void RTC_AlarmConfig(void)
     salarmstructure.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY;
     salarmstructure.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
     salarmstructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
-    salarmstructure.AlarmTime.Hours = 0;
+    salarmstructure.AlarmTime.Hours = 1;
     salarmstructure.AlarmTime.Minutes = 0;
-    salarmstructure.AlarmTime.Seconds = 1;
+    salarmstructure.AlarmTime.Seconds = 0;
     salarmstructure.AlarmTime.SubSeconds = 0;
 
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BIN) == HAL_OK)
@@ -117,6 +118,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *RtcHandle)
     HAL_RTC_SetTime(RtcHandle, &sTime, RTC_FORMAT_BIN);
 
     rt_sem_release(RTC_IRQ_Sem);
+    RTC_Hours++;
 }
 void RTC_Init(void)
 {

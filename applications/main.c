@@ -44,7 +44,7 @@ int main(void)
     Key_Reponse();
     Radio_Task_Init();
     wdt_sample();
-    //RTC_Init();
+    RTC_Init();
     //WiFi_Init();
     while (1)
     {
