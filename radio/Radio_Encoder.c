@@ -56,7 +56,7 @@ Reponse WorCheck={0};
 
 void Check_Wor_Recv(uint32_t From_ID,uint8_t Command,uint8_t Data)
 {
-    if(WorCheck.TargetID == From_ID && WorCheck.Command == Command && WorCheck.Data == Data)
+    if(WorCheck.TargetID == From_ID)
     {
         LOG_D("Wor Recv Verify OK\r\n");
         WorCheck.CorrectFlag = 1;
