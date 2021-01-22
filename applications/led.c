@@ -133,17 +133,17 @@ void beep_start(uint8_t led_id,int mode)
             agile_led_start(led0);
         }
         break;
-    case 4://六声
-        agile_led_set_light_mode(beep, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
+    case 4://五声
+        agile_led_set_light_mode(beep, "200,200,200,200,200,200,200,200,200,5000", -1);
         agile_led_start(beep);
         if(led_id)
         {
-            agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
+            agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led1);
         }
         else
         {
-            agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
+            agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led0);
         }
         break;
@@ -203,6 +203,21 @@ void beep_start(uint8_t led_id,int mode)
         {
             agile_led_stop(led0);
             agile_led_set_light_mode(led0, "200,200", 5);
+            agile_led_start(led0);
+        }
+        break;
+
+    case 9://五声
+        agile_led_set_light_mode(beep, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
+        agile_led_start(beep);
+        if(led_id)
+        {
+            agile_led_set_light_mode(led1, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
+            agile_led_start(led1);
+        }
+        else
+        {
+            agile_led_set_light_mode(led0, "200,200,200,200,200,200,200,200,200,200,200,5000", -1);
             agile_led_start(led0);
         }
         break;

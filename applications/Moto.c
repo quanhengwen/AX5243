@@ -104,7 +104,7 @@ void Turn1_Timer_Callback(void *parameter)
     if(!Turn1_Flag)
     {
         LOG_D("Moto1 is Fail\r\n");
-        beep_start(0,4);
+        beep_start(0,9);
         //上报
     }
 }
@@ -115,7 +115,7 @@ void Turn2_Timer_Callback(void *parameter)
     if(!Turn2_Flag)
     {
         LOG_D("Moto2 is Fail\r\n");
-        beep_start(0,4);
+        beep_start(0,9);
         //上报
     }
 }
