@@ -24,6 +24,7 @@
 #include "moto.h"
 #include "led.h"
 #include "key.h"
+#include "pin_config.h"
 
 #define DBG_TAG "radio_decoder"
 #define DBG_LVL DBG_LOG
@@ -48,6 +49,36 @@ extern uint8_t ValveStatus ;
 extern uint32_t Self_Id;
 extern enum Device_Status Now_Status;
 
+uint8_t Recv_Num;
+rt_timer_t Factory_Test_Timer = RT_NULL;
+void Factory_Test_Timer_Callback(void *parameter)
+{
+    if(Recv_Num>7)
+    {
+        led_on(1);
+        LOG_D("Test is Success,Reselt is %d\r\n",Recv_Num);
+    }
+    else
+    {
+        led_on(0);
+        LOG_D("Test is Failed,Reselt is %d\r\n",Recv_Num);
+    }
+}
+uint8_t Factory_Test(void)
+{
+    rt_pin_mode(TEST, PIN_MODE_INPUT_PULLUP);
+    if(rt_pin_read(TEST)==0)
+    {
+        LOG_D("Start Test\r\n");
+        Recv_Num = 0;
+        Factory_Test_Timer = rt_timer_create("Factory_Test", Factory_Test_Timer_Callback, RT_NULL, 1000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
+        rt_timer_start(Factory_Test_Timer);
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 uint8_t Check_Valid(uint32_t From_id)
 {
     if(Flash_Get_Key_Valid(From_id)==1)return 0;
@@ -325,7 +356,14 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
         rx_buffer[rx_len-2]=0;
         sscanf((const char *)&rx_buffer[1],"{%ld,%ld,%d,%d,%d}",&Rx_message.Target_ID,&Rx_message.From_ID,&Rx_message.Counter,&Rx_message.Command,&Rx_message.Data);
         Clear_Device_Time(Rx_message.From_ID);
-        if(Rx_message.Target_ID==Self_Id ||Rx_message.Target_ID==99999999)DataSolve(Rx_message);
+        if(Rx_message.From_ID == 10000001)
+        {
+            Recv_Num++;
+        }
+        if(Rx_message.Target_ID==Self_Id ||Rx_message.Target_ID==99999999)
+        {
+            DataSolve(Rx_message);
+        }
         Radio_Counter = Rx_message.Counter;
     }
 }

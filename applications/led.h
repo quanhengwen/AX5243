@@ -22,5 +22,6 @@ void beeplive(void);
 void beepback(void);
 void loss_led_start(void);
 void loss_led_stop(void);
+void led_on(uint8_t id);
 
 #endif /* APPLICATIONS_LED_H_ */

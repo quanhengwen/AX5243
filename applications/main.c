@@ -32,19 +32,31 @@
 
 int main(void)
 {
-    fal_init();
-    easyflash_init();
-    Boot_Times_Record();
-    LoadDevice2Memory();
-    WarningInit();
-    led_Init();
-    Moto_Init();
-    button_Init();
-    WaterScan_Init();
-    Key_Reponse();
-    Radio_Task_Init();
-    wdt_sample();
-    RTC_Init();
+    if(Factory_Test())
+    {
+        fal_init();
+        easyflash_init();
+        Boot_Times_Record();
+        LoadDevice2Memory();
+        led_Init();
+        Radio_Task_Init();
+    }
+    else
+    {
+        fal_init();
+        easyflash_init();
+        Boot_Times_Record();
+        LoadDevice2Memory();
+        WarningInit();
+        led_Init();
+        Moto_Init();
+        button_Init();
+        WaterScan_Init();
+        Key_Reponse();
+        Radio_Task_Init();
+        wdt_sample();
+        RTC_Init();
+    }
     //WiFi_Init();
     while (1)
     {

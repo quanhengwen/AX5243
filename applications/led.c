@@ -318,3 +318,12 @@ void led_Stop(uint8_t led_id)
         break;
     }
 }
+void led_on(uint8_t id)
+{
+    switch(id)
+    {
+    case 0:agile_led_on(led0);agile_led_off(led1);break;
+    case 1:agile_led_on(led1);agile_led_off(led0);break;
+    }
+
+}

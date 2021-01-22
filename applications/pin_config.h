@@ -29,6 +29,7 @@
 #define Senor1                  36
 #define Senor2                  37
 #define Moto                    1
+#define TEST                    21
 //WIFI
 #define WIFIEN                  15
 
