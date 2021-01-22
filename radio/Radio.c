@@ -704,6 +704,7 @@ void ChangeWorFreq(void)//axradio_phy_chanfreq[0]
         LOG_D("Freq Already Wor\r\n");
     }
 }
+MSH_CMD_EXPORT(ChangeWorFreq,ChangeWorFreq);
 void BackNormalFreq(void)//axradio_phy_chanfreq[1]
 {
     if(!axradio_freq_now)
@@ -720,6 +721,7 @@ void BackNormalFreq(void)//axradio_phy_chanfreq[1]
         LOG_D("Freq Already Normal \r\n");
     }
 }
+MSH_CMD_EXPORT(BackNormalFreq,BackNormalFreq);
 uint8_t InitAX5043(void)
 {
     uint8_t ubi,ubTemp;
@@ -1047,7 +1049,7 @@ void AX5043_OFF(void)
 
 void transmit_packet_task(uint8_t *Buf, uint8_t u8Len)
 {
-    SetChannel(0);
+   // SetChannel(0);
     SpiWriteSingleAddressRegister(REG_AX5043_PWRMODE, AX5043_PWRSTATE_XTAL_ON); //AX5043_PWRMODE = AX5043_PWRSTATE_XTAL_ON;    Crystal Oscillator enabled
     SpiWriteSingleAddressRegister(REG_AX5043_PWRMODE, AX5043_PWRSTATE_FIFO_ON); //AX5043_PWRMODE = AX5043_PWRSTATE_FIFO_ON;    FIFO enabled
     SetTransmitMode();//   ����TX�Ĵ�����������TX����Ƶ��

@@ -15,6 +15,7 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len);
 void Start_Learn(void);
 void Stop_Learn(void);
 void Start_Learn_Key(void);
-uint8_t Factory_Test(void);
+uint8_t Factory_Detect(void);
+void Factory_Test(void);
 
 #endif /* RADIO_RADIO_DECODER_H_ */

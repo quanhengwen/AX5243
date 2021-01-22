@@ -13,7 +13,6 @@ static rt_device_t wdg_dev;         /* 看门狗设备句柄 */
 void FeedDog(void)
 {
     rt_device_control(wdg_dev, RT_DEVICE_CTRL_WDT_KEEPALIVE, NULL);
-    //LOG_D("feed the dog!\n ");
 }
 int wdt_sample(void)
 {

@@ -64,20 +64,24 @@ void Factory_Test_Timer_Callback(void *parameter)
         LOG_D("Test is Failed,Reselt is %d\r\n",Recv_Num);
     }
 }
-uint8_t Factory_Test(void)
+uint8_t Factory_Detect(void)
 {
     rt_pin_mode(TEST, PIN_MODE_INPUT_PULLUP);
     if(rt_pin_read(TEST)==0)
     {
-        LOG_D("Start Test\r\n");
-        Recv_Num = 0;
-        Factory_Test_Timer = rt_timer_create("Factory_Test", Factory_Test_Timer_Callback, RT_NULL, 1000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
-        rt_timer_start(Factory_Test_Timer);
         return 1;
     }
-    else {
+    else
+    {
         return 0;
     }
+}
+void Factory_Test(void)
+{
+    Recv_Num = 0;
+    Factory_Test_Timer = rt_timer_create("Factory_Test", Factory_Test_Timer_Callback, RT_NULL, 1000, RT_TIMER_FLAG_ONE_SHOT|RT_TIMER_FLAG_SOFT_TIMER);
+    rt_timer_start(Factory_Test_Timer);
+    LOG_D("Start Test\r\n");
 }
 uint8_t Check_Valid(uint32_t From_id)
 {

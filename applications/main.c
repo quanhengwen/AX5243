@@ -25,6 +25,7 @@
 #include "RTCWork.h"
 #include "status.h"
 #include "dog.h"
+#include "radio_decoder.h"
 
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -32,14 +33,16 @@
 
 int main(void)
 {
-    if(Factory_Test())
+    if(Factory_Detect())
     {
         fal_init();
         easyflash_init();
         Boot_Times_Record();
         LoadDevice2Memory();
         led_Init();
+        wdt_sample();
         Radio_Task_Init();
+        Factory_Test();
     }
     else
     {

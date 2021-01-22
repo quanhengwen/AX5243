@@ -322,8 +322,8 @@ void led_on(uint8_t id)
 {
     switch(id)
     {
-    case 0:agile_led_on(led0);agile_led_off(led1);break;
-    case 1:agile_led_on(led1);agile_led_off(led0);break;
+    case 0:agile_led_on(led0);agile_led_off(led1);agile_led_set_light_mode(beep, "100,50,100,50,100,50,100,500", -1);agile_led_start(beep);break;
+    case 1:agile_led_on(led1);agile_led_off(led0);agile_led_set_light_mode(beep, "100,50,100,50,100,50,100,500", -1);agile_led_start(beep);break;
     }
 
 }
