@@ -42,24 +42,28 @@ void Enable_Warining(void)
 }
 void WarningWithPeak(uint8_t status)
 {
-    switch(status)
+    if(Detect_Learn())
     {
-    case 0://恢复正常
-        BackToNormal();
-        beep_stop();
-        loss_led_stop();
-        break;
-    case 1://测水线掉落
-        beep_start(0,1);//红灯,蜂鸣器三下
-        loss_led_start();
-        LOG_D("MasterLostPeakWarning\r\n");
-        break;
-    case 2://测水线短路
-        Warning_Enable_Num(4);
-        break;
-    case 3://测水线短路解除
-        MasterStatusChangeToDeAvtive();
-        break;
+        switch(status)
+        {
+        case 0://恢复正常
+
+            BackToNormal();
+            beep_stop();
+            loss_led_stop();
+            break;
+        case 1://测水线掉落
+            beep_start(0,1);//红灯,蜂鸣器三下
+            loss_led_start();
+            LOG_D("MasterLostPeakWarning\r\n");
+            break;
+        case 2://测水线短路
+            Warning_Enable_Num(4);
+            break;
+        case 3://测水线短路解除
+            MasterStatusChangeToDeAvtive();
+            break;
+        }
     }
 }
 void WaterScan_Clear(void)

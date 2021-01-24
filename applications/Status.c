@@ -199,6 +199,14 @@ void WarningInit(void)
     LOG_D("Warning Event Init Success\r\n");
 }
 MSH_CMD_EXPORT(WarningInit,WarningInit);
+uint8_t Detect_Learn(void)
+{
+    if(Now_Status!=Learn)
+    {
+        return 1;
+    }
+    else return 0;
+}
 void BackToNormal(void)
 {
     WaterScan_Clear();

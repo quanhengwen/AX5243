@@ -17,12 +17,6 @@ void MasterAlarmWaterDisable(void);
 void MasterStatusChangeToDeAvtive(void);
 void OfflineDisableWarning(void);
 void RadioInitFail(void);
-//void SlaverLowBatteryWarning(void);
-//void SlaverWaterAlarmWarning(void);
-//void MasterLostPeakWarning(void);
-//void MasterWaterAlarmWarning(void);
-//void BackToNormal(void);
-//void OfflineWarning(void);
-//void MasterAlarmWaterDisable(void);
+uint8_t Detect_Learn(void);
 
 #endif /* APPLICATIONS_STATUS_H_ */
