@@ -83,6 +83,7 @@ void Factory_Test(void)
     rt_timer_start(Factory_Test_Timer);
     LOG_D("Start Test\r\n");
 }
+MSH_CMD_EXPORT(Factory_Test,Factory_Test);
 uint8_t Check_Valid(uint32_t From_id)
 {
     if(Flash_Get_Key_Valid(From_id)==1)return 0;
@@ -124,7 +125,7 @@ void Stop_Learn(void)
 void learn_test(void)
 {
     Add_Device(20022636);
-    Add_DoorDevice(38000001);
+    Add_DoorDevice(33333333);
 }
 MSH_CMD_EXPORT(learn_test,learn_test);
 void Device_Learn(Message buf)

@@ -1072,7 +1072,7 @@ void Normal_send(uint8_t *Buf, uint8_t u8Len)
 void Wor_send(uint8_t *Buf, uint8_t u8Len)
 {
     ChangeWorFreq();
-    axradio_txbuffer_cnt = 130;
+    axradio_txbuffer_cnt = 150;
     transmit_packet_task(Buf,u8Len);
 }
 void wor_test1(void)

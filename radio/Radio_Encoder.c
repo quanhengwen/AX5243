@@ -172,7 +172,7 @@ void RadioDequeue(void *paramaeter)
                 SendWithOldBuff();
                 LOG_D("WorCheck Fail.CorrectFlag is %d,WarningFlag is %d\r\n",WorCheck.CorrectFlag,WorCheck.WarningFlag);
                 WorCheck.WarningFlag++;
-                rt_thread_mdelay(9000);
+                rt_thread_mdelay(15000);
             }
             else
             {
