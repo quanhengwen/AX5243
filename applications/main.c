@@ -35,10 +35,6 @@ int main(void)
 {
     if(Factory_Detect())
     {
-        fal_init();
-        easyflash_init();
-        Boot_Times_Record();
-        LoadDevice2Memory();
         led_Init();
         wdt_sample();
         Radio_Task_Init();
