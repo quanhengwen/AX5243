@@ -55,10 +55,12 @@ void WarningWithPeak(uint8_t status)
         case 1://测水线掉落
             beep_start(0,1);//红灯,蜂鸣器三下
             loss_led_start();
+            WariningUpload(0,3);
             LOG_D("MasterLostPeakWarning\r\n");
             break;
         case 2://测水线短路
             Warning_Enable_Num(4);
+            WariningUpload(0,4);
             break;
         case 3://测水线短路解除
             MasterStatusChangeToDeAvtive();

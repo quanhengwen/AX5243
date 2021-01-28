@@ -15,7 +15,7 @@
 #include "wifi.h"
 #include "wifi-service.h"
 
-#define DBG_TAG "wifi-service"
+#define DBG_TAG "wifi_service"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 

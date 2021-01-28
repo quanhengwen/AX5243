@@ -53,13 +53,14 @@ int main(void)
         WaterScan_Init();
         Key_Reponse();
         Radio_Task_Init();
-        wdt_sample();
+        //wdt_sample();
         RTC_Init();
+        WiFi_Init();
     }
-    //WiFi_Init();
+
     while (1)
     {
-        FeedDog();
+        //FeedDog();
         rt_thread_mdelay(1000);
     }
     return RT_EOK;

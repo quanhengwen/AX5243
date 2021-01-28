@@ -19,4 +19,12 @@ void OfflineDisableWarning(void);
 void RadioInitFail(void);
 uint8_t Detect_Learn(void);
 
+typedef struct
+{
+    uint8_t warning_id;
+    uint8_t last_id;
+    uint8_t priority;
+    void (*callback)(void*);
+}WariningEvent;
+
 #endif /* APPLICATIONS_STATUS_H_ */

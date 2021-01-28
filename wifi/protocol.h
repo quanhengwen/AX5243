@@ -366,6 +366,18 @@ mcu在wifi模块正确联网后可调用 get_green_time_with_zone() 函数发起
 //故障清除(只下发)
 //备注:
 #define DPID_CLEAR_ERROR 104
+//信号强度(只上报)
+//备注:
+#define DPID_RSSI 105
+//通信间隔时间(只上报)
+//备注:
+#define DPID_PASTTIME 106
+//电量强度(只上报)
+//备注:
+#define DPID_BAT 107
+//童锁开关(可下发可上报)
+//备注:
+#define DPID_LOCK 108
 
 
 

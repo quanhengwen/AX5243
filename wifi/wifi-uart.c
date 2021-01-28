@@ -15,10 +15,6 @@
 #include "wifi.h"
 #include "wifi-service.h"
 
-#define DBG_TAG "wifi-uart"
-#define DBG_LVL DBG_LOG
-#include <rtdbg.h>
-
 /* 用于接收消息的信号量 */
 static struct rt_semaphore rx_sem;
 static rt_device_t serial;
@@ -26,6 +22,11 @@ static rt_thread_t WiFi_Uart_Thread = RT_NULL;
 struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
 
 #define WiFi_UART_NAME                   "uart1"
+
+
+#define DBG_TAG "wifi_uart"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
 
 void wifi_gpio_enable(void)
 {
@@ -65,7 +66,6 @@ void data_parsing(void)
         ch = uart_sample_get_char();
         uart_receive_input(ch);
         //LOG_D("GET Data is %X\r\n",ch);
-        //rt_device_write(serial,0,&ch,1);
     }
 }
 void WiFi_Byte_Send(uint8_t data)
@@ -112,13 +112,30 @@ void wifi_uart_init(void)
 MSH_CMD_EXPORT(wifi_uart_init, wifi_uart_init);
 void WiFi_Init(void)
 {
-    uint8_t stat;
+    uint8_t i=10;
     wifi_gpio_enable();
     wifi_uart_init();
     wifi_protocol_init();
     wifi_service_init();
+    mcu_reset_wifi();
+    while(mcu_get_reset_wifi_flag()==0&&i--)
+    {
+        LOG_D("Try to reset Wifi,Counter is %d\r\n",i);
+        rt_thread_mdelay(1000);
+    }
+    i=10;
     mcu_set_wifi_mode(0);
-    rt_thread_mdelay(100);
-    stat = mcu_get_wifimode_flag();
-    if(stat)LOG_D("Wifi Init Success\r\n"); else LOG_D("Wifi Init Fail\r\n");
+    while(mcu_get_wifimode_flag()==0&&i--)
+    {
+        LOG_D("Try to Init Wifi,Counter is %d\r\n",i);
+        rt_thread_mdelay(1000);
+    }
+    if(i>0)
+    {
+        LOG_D("Wifi Init Success\r\n");
+    }
+    else
+    {
+        LOG_D("Wifi Init Fail\r\n");
+    }
 }

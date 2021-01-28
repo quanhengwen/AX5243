@@ -26,11 +26,17 @@
 
 #include "wifi.h"
 #include "ulog.h"
+#include "moto.h"
+#include "status.h"
+#include "flashwork.h"
+#include "stdio.h"
+#include "wifi-service.h"
 
 #define DBG_TAG "wifi-decoder"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
+extern Device_Info Global_Device;
 /******************************************************************************
                               第一步:初始化
 1:在需要使用到wifi相关文件的文件中include "wifi.h"
@@ -76,10 +82,14 @@ const char *weather_choose[WEATHER_CHOOSE_CNT] = {
 ******************************************************************************/
 const DOWNLOAD_CMD_S download_cmd[] =
 {
-  {DPID_FAIL_STATE, DP_TYPE_FAULT},
+  {DPID_FAIL_STATE, DP_TYPE_VALUE},
   {DPID_DEVICE_ID, DP_TYPE_VALUE},
   {DPID_VALVE_STATE, DP_TYPE_BOOL},
   {DPID_CLEAR_ERROR, DP_TYPE_BOOL},
+  {DPID_RSSI, DP_TYPE_VALUE},
+  {DPID_PASTTIME, DP_TYPE_VALUE},
+  {DPID_BAT, DP_TYPE_VALUE},
+  {DPID_LOCK, DP_TYPE_BOOL},
 };
 
 
@@ -121,13 +131,38 @@ void uart_transmit_output(unsigned char value)
 此函数为MCU内部必须调用
 用户也可调用此函数实现全部数据上报
 ******************************************************************************/
-
 /**
  * @brief  系统所有dp点信息上传,实现APP和muc数据同步
  * @param  Null
  * @return Null
  * @note   此函数SDK内部需调用，MCU必须实现该函数内数据上报功能，包括只上报和可上报可下发型数据
  */
+void WariningUpload(uint32_t device_id,uint8_t state)
+{
+    char *Buf = rt_malloc(20);
+    LOG_D("WariningUpload Device ID is %ld,State is %d\r\n",device_id,state);
+   if(device_id>0)
+   {
+       sprintf(Buf,"%ld",device_id);
+       mcu_dp_value_update(DPID_FAIL_STATE,state,Buf,my_strlen(Buf)); //VALUE型数据上报;
+       mcu_dp_value_update(DPID_DEVICE_ID,device_id,Buf,my_strlen(Buf)); //VALUE型数据上报;
+   }
+   else
+   {
+       sprintf(Buf,"%d",0);
+       mcu_dp_value_update(DPID_FAIL_STATE,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+       mcu_dp_value_update(DPID_DEVICE_ID,Buf,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+   }
+   rt_free(Buf);
+}
+void MotoUpload(uint8_t state)
+{
+    char *Buf = rt_malloc(20);
+    LOG_D("MotoUpload State is %d\r\n",state);
+    sprintf(Buf,"%d",0);
+    mcu_dp_value_update(DPID_VALVE_STATE,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+    rt_free(Buf);
+}
 void all_data_update(void)
 {
     //#error "请在此处理可下发可上报数据及只上报数据示例,处理完成后删除该行"
@@ -144,13 +179,38 @@ void all_data_update(void)
     mcu_dp_enum_update(DPID_COUNTDOWN_SET,当前喷雾倒计时,子设备id,子设备id长度); //枚举型数据上报;
     */
   
-/* 
-    //此代码为平台自动生成，请按照实际数据修改每个可下发可上报函数和只上报函数
-    mcu_dp_fault_update(DPID_FAIL_STATE,当前故障状态,子设备ID,子设备ID长度); //故障型数据上报;
-    mcu_dp_value_update(DPID_DEVICE_ID,当前故障设备ID,子设备ID,子设备ID长度); //VALUE型数据上报;
-    mcu_dp_bool_update(DPID_VALVE_STATE,当前阀门状态,子设备ID,子设备ID长度); //BOOL型数据上报;
 
-*/
+    //此代码为平台自动生成，请按照实际数据修改每个可下发可上报函数和只上报函数
+//    mcu_dp_value_update(DPID_FAIL_STATE,当前故障状态,子设备ID,子设备ID长度); //VALUE型数据上报;
+//    mcu_dp_value_update(DPID_DEVICE_ID,当前故障设备ID,子设备ID,子设备ID长度); //VALUE型数据上报;
+    mcu_dp_bool_update(DPID_VALVE_STATE,0,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
+    for(uint8_t i=1;i<=Global_Device.Num;i++)
+    {
+        char *Buf = rt_malloc(20);
+        sprintf(Buf,"%ld",Global_Device.ID[i]);
+        mcu_dp_value_update(DPID_RSSI,Global_Device.Rssi[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+        rt_free(Buf);
+    }
+    for(uint8_t i=1;i<=Global_Device.Num;i++)
+    {
+        char *Buf = rt_malloc(20);
+        sprintf(Buf,"%ld",Global_Device.ID[i]);
+        mcu_dp_value_update(DPID_PASTTIME,Global_Device.ID_Time[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+        rt_free(Buf);
+    }
+    for(uint8_t i=1;i<=Global_Device.Num;i++)
+    {
+        char *Buf = rt_malloc(20);
+        sprintf(Buf,"%ld",Global_Device.ID[i]);
+        mcu_dp_value_update(DPID_BAT,Global_Device.Bat[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+        rt_free(Buf);
+    }
+//    mcu_dp_value_update(DPID_RSSI,当前信号强度,子设备ID,子设备ID长度); //VALUE型数据上报;
+//    mcu_dp_value_update(DPID_PASTTIME,当前通信间隔时间,子设备ID,子设备ID长度); //VALUE型数据上报;
+//    mcu_dp_value_update(DPID_BAT,当前电量强度,子设备ID,子设备ID长度); //VALUE型数据上报;
+//    mcu_dp_bool_update(DPID_LOCK,当前童锁开关,子设备ID,子设备ID长度); //BOOL型数据上报;
+
+
 
 }
 
@@ -190,8 +250,9 @@ static unsigned char dp_download_valve_state_handle(const unsigned char value[],
     
         //若子设备id是“0000”，则表示网关本身的dp
         *****************************************************************************/
-  
+        Moto_CloseByWifi();
     }else {
+        Moto_OpenByWifi();
         //开关开
     }
   
@@ -233,13 +294,55 @@ static unsigned char dp_download_clear_error_handle(const unsigned char value[],
     
         //若子设备id是“0000”，则表示网关本身的dp
         *****************************************************************************/
+    }else {
+        //开关开
+    }
+    Warning_Disable();
+    //处理完DP数据后应有反馈
+    ret = mcu_dp_bool_update(DPID_CLEAR_ERROR,clear_error, sub_id_buf, sub_id_len);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_lock_handle
+功能描述 : 针对DPID_LOCK的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+        : sub_id_buf:子设备id
+        : sub_id_len:子设备id数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_lock_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+{
+    //示例:当前DP类型为BOOL
+    unsigned char ret;
+    //0:关/1:开
+    unsigned char lock;
+    
+    lock = mcu_get_dp_download_bool(value,length);
+    if(lock == 0) {
+        //开关关
+        /*****************************************************************************
+        //dp数据处理前需要判断是哪一个子设备id的dp
+        //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
+        if(my_strcmp(sub_id_buf,"1234") == 0) {
+    
+        }else if(my_strcmp(sub_id_buf,"5678") == 0) {
+    
+        }
+    
+        //若子设备id是“0000”，则表示网关本身的dp
+        *****************************************************************************/
   
     }else {
         //开关开
     }
   
     //处理完DP数据后应有反馈
-    ret = mcu_dp_bool_update(DPID_CLEAR_ERROR,clear_error, sub_id_buf, sub_id_len);
+    ret = mcu_dp_bool_update(DPID_LOCK,lock, sub_id_buf, sub_id_len);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -281,6 +384,10 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
         case DPID_CLEAR_ERROR:
             //故障清除处理函数
             ret = dp_download_clear_error_handle(value,length,sub_id_buf,sub_id_len);
+        break;
+        case DPID_LOCK:
+            //童锁开关处理函数
+            ret = dp_download_lock_handle(value,length,sub_id_buf,sub_id_len);
         break;
 
         default:

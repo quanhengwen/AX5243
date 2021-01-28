@@ -14,6 +14,8 @@ void Moto_Open(uint8_t ActFlag);
 void Moto_Close(uint8_t ActFlag);
 void Moto_Init(void);
 void Moto_Detect(void);
+void Moto_OpenByWifi(void);
+void Moto_CloseByWifi(void);
 
 
 #endif /* APPLICATIONS_MOTO_H_ */

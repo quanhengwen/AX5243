@@ -9,6 +9,7 @@
 #include <fal.h>
 #include <stdlib.h>
 #include <string.h>
+#include "wifi-service.h"
 
 #define DBG_TAG "flash"
 #define DBG_LVL DBG_LOG
@@ -40,7 +41,6 @@ void Boot_Times_Record(void)
     sprintf(c_new_boot_times, "%ld", i_boot_times);
     /* 保存开机次数的值 */
     ef_set_env("boot_times", c_new_boot_times);
-    ef_save_env();
 }
 uint32_t Flash_Get_Boot_Times(void)
 {
@@ -96,7 +96,6 @@ void Flash_Key_Change(uint32_t key,uint32_t value)
     char *Temp_ValueBuf = rt_malloc(20);//申请临时buffer空间
     sprintf(Temp_ValueBuf, "%ld", value);
     ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
-    ef_save_env();
     rt_free(Temp_KeyBuf);
     rt_free(Temp_ValueBuf);
     LOG_D("Writing %ld to key %ld \r\n", value,key);
@@ -107,7 +106,6 @@ void Flash_LearnNums_Change(uint32_t value)
     char *Temp_ValueBuf = rt_malloc(10);
     sprintf(Temp_ValueBuf, "%ld", value);
     ef_set_env(keybuf, Temp_ValueBuf);
-    ef_save_env();
     rt_free(Temp_ValueBuf);
     LOG_D("Writing %ld to key %s\r\n", value,keybuf);
 }
@@ -117,9 +115,56 @@ void Flash_Moto_Change(uint8_t value)
     char *Temp_ValueBuf = rt_malloc(10);
     sprintf(Temp_ValueBuf, "%d", value);
     ef_set_env(keybuf, Temp_ValueBuf);
-    ef_save_env();
     rt_free(Temp_ValueBuf);
     LOG_D("Writing %ld to key %s\r\n", value,keybuf);
+}
+uint8_t Device_RssiGet(uint32_t Device_ID)
+{
+    char *keybuf = rt_malloc(20);
+    sprintf(keybuf, "Rssi:%ld", Device_ID);//将传入的数字转换成数组
+    char *read_value_temp;//真实值
+    uint32_t read_value = 0;
+    read_value_temp = strdup(ef_get_env(keybuf));
+    read_value = atol(read_value_temp);
+    rt_free(keybuf);//释放临时buffer对应内存空间
+    rt_free(read_value_temp);//释放临时buffer对应内存空间
+    LOG_D("Reading Rssi %d value %ld \r\n", Device_ID, read_value);//输出
+    return read_value;
+}
+void Device_RssiChange(uint32_t Device_ID,uint8_t value)
+{
+    char *Temp_KeyBuf = rt_malloc(20);
+    char *Temp_ValueBuf = rt_malloc(20);
+    sprintf(Temp_KeyBuf, "Rssi:%ld", Device_ID);
+    sprintf(Temp_ValueBuf, "%d", value);
+    ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
+    rt_free(Temp_KeyBuf);
+    rt_free(Temp_ValueBuf);
+    LOG_D("Writing Rssi %ld to key %s\r\n", Device_ID,value);
+}
+uint8_t Device_BatGet(uint32_t Device_ID)
+{
+    char *keybuf = rt_malloc(20);
+    sprintf(keybuf, "Bat:%ld", Device_ID);//将传入的数字转换成数组
+    char *read_value_temp;//真实值
+    uint32_t read_value = 0;
+    read_value_temp = strdup(ef_get_env(keybuf));
+    read_value = atol(read_value_temp);
+    rt_free(keybuf);//释放临时buffer对应内存空间
+    rt_free(read_value_temp);//释放临时buffer对应内存空间
+    LOG_D("Reading Bat %d value %ld \r\n", Device_ID, read_value);//输出
+    return read_value;
+}
+void Device_BatChange(uint32_t Device_ID,uint8_t value)
+{
+    char *Temp_KeyBuf = rt_malloc(20);
+    char *Temp_ValueBuf = rt_malloc(20);
+    sprintf(Temp_KeyBuf, "Bat:%ld", Device_ID);
+    sprintf(Temp_ValueBuf, "%d", value);
+    ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
+    rt_free(Temp_KeyBuf);
+    rt_free(Temp_ValueBuf);
+    LOG_D("Writing Rssi %ld to key %s\r\n", Device_ID,value);
 }
 uint8_t Add_Device(uint32_t Device_ID)
 {
@@ -201,7 +246,26 @@ uint8_t Update_Device_Bat(uint32_t Device_ID,uint8_t bat)//更新电量
         if(Global_Device.ID[num]==Device_ID)
         {
             Global_Device.Bat[num] = bat;
+            Device_BatChange(Device_ID,bat);
             LOG_D("Device Bat %d is Increase to %d",Global_Device.ID[num],bat);
+            return RT_EOK;
+        }
+        num--;
+    }
+    LOG_D("Device %d is Not Increase Success",Global_Device.ID[num]);
+    return RT_ERROR;
+}
+uint8_t Update_Device_Rssi(uint32_t Device_ID,uint8_t rssi)//更新Rssi
+{
+    uint16_t num = Global_Device.Num;
+    if(!num)return RT_ERROR;
+    while(num)
+    {
+        if(Global_Device.ID[num]==Device_ID)
+        {
+            Global_Device.Rssi[num] = rssi;
+            Device_RssiChange(Device_ID,rssi);
+            LOG_D("Device rssi %d is Increase to %d",Global_Device.ID[num],rssi);
             return RT_EOK;
         }
         num--;
@@ -276,10 +340,14 @@ void Detect_All_Time(void)
             {
                 LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
             }
+            WariningUpload(Global_Device.ID[num],5);
         }
         num--;
     }
-    if(WarnFlag)Warning_Enable_Num(5);
+    if(WarnFlag)
+    {
+        Warning_Enable_Num(5);
+    }
     Clear_All_Time();
     LOG_D("Detect_All_Time OK\r\n");
 }
@@ -335,7 +403,11 @@ void LoadDevice2Memory(void)//数据载入到内存中
     for(uint8_t i=1;i<=Global_Device.Num;i++)
     {
         Global_Device.ID[i] = Flash_Get_Key_Value(i);
-        LOG_D("GOT ID is %ld",Global_Device.ID[i]);
+        LOG_D("GOT ID is %ld\r\n",Global_Device.ID[i]);
+        Global_Device.Bat[i] = Device_BatGet(Global_Device.ID[i]);
+        LOG_D("GOT Bat is %ld\r\n",Global_Device.Bat[i]);
+        Global_Device.Rssi[i] = Device_RssiGet(Global_Device.ID[i]);
+        LOG_D("GOT Rssi is %ld\r\n",Global_Device.Rssi[i]);
     }
     Global_Device.DoorID = Flash_Get_Key_Value(88888888);
     Global_Device.LastFlag = Flash_Get_Moto_Flag();

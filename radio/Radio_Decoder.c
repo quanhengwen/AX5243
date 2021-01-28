@@ -204,6 +204,7 @@ void DataSolve(Message buf)
             {
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
                 Warning_Enable_Num(1);
+                WariningUpload(buf.From_ID,1);
             }
             else
             {
@@ -267,6 +268,7 @@ void DataSolve(Message buf)
                             RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
                         }
                         Enable_Warining();
+                        WariningUpload(buf.From_ID,2);
                     }
                 }
             }
@@ -350,7 +352,7 @@ void status_serach(void)
     LOG_D("Status is %d\r\n",Now_Status);
 }
 MSH_CMD_EXPORT(status_serach,status_serach);
-void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
+void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len,int8_t rssi)
 {
     Message Rx_message;
     LOG_D("Recv ok\r\n");
@@ -370,5 +372,7 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
             DataSolve(Rx_message);
         }
         Radio_Counter = Rx_message.Counter;
+        Update_Device_Rssi(Rx_message.From_ID,rssi);
     }
+
 }

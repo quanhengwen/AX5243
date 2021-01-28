@@ -27,13 +27,7 @@ extern enum Device_Status Now_Status;
 extern uint8_t ValveStatus;
 extern uint16_t Radio_Counter;
 
-typedef struct
-{
-    uint8_t warning_id;
-    uint8_t last_id;
-    uint8_t priority;
-    void (*callback)(void*);
-}WariningEvent;
+
 
 WariningEvent NowStatusEvent;
 WariningEvent SlaverLowPowerEvent;

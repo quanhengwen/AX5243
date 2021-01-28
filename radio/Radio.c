@@ -57,6 +57,7 @@ uint8_t wor_flag=0;
 #define axradio_phy_preamble_byte 0x55
 
 uint8_t ubReceiveFlag;
+uint8_t ubRssi;;
 uint8_t axradio_freq_select = 1;
 uint8_t axradio_freq_now = 1;
 uint32_t axradio_txbuffer_cnt = 0;
@@ -396,6 +397,14 @@ uint8_t SpiReadSingleAddressRegister(uint8_t Addr)
     return RcvAddr ;
 }
 
+int8_t SpiReadUnderSingleAddressRegister(uint8_t Addr)//负数
+{
+    uint8_t ubAddr ;
+    uint8_t RcvAddr ;
+    ubAddr = Addr&0x7F ;//read common bit7=0
+    rt_spi_send_then_recv(ax5043_device,&ubAddr,1,&RcvAddr,1);
+    return RcvAddr ;
+}
 /***********************************************************************
 ==读取指定长寄存器==
 ***********************************************************************/
@@ -886,12 +895,9 @@ void SetTransmitMode(void)
 ***********************************************************************/
 void AX5043ReceiverON(void)
 {
-    uint8_t ubTemp;
     SpiWriteLongAddressRegister(REG_AX5043_RSSIREFERENCE, 0x19);
     SpiWriteLongAddressRegister(REG_AX5043_TMGRXPREAMBLE1, 0x00); //   AX5043_TMGRXPREAMBLE1(0x229) = 0x00;
-    ubTemp = SpiReadLongAddressRegister(REG_AX5043_PKTSTOREFLAGS);
-    ubTemp &= ~0x40;
-    SpiWriteLongAddressRegister(REG_AX5043_PKTSTOREFLAGS , ubTemp ); // AX5043_PKTSTOREFLAGS &= (uint8_t)~0x40;
+    SpiWriteLongAddressRegister(REG_AX5043_PKTSTOREFLAGS , 0x50 ); // AX5043_PKTSTOREFLAGS &= (uint8_t)~0x40;
 
     //���FIFO
     SpiWriteSingleAddressRegister(REG_AX5043_FIFOSTAT,0x03);  // AX5043_FIFOSTAT(0x28) = 3;  bit[5:0]=0b00011 Clear FIFO Data and Flags  ���FIFO page 69
@@ -937,13 +943,15 @@ void SetReceiveMode(void)
 * Return   ��
 * Notice   ��
 ***********************************************************************/
+
 void ReceiveData(void)
 {
     uint8_t ubDataLen,ubTepm;
     uint8_t ubTemCom;
     uint8_t ubDataFlag;
     uint8_t ubOffSet;
-    signed char ubRssi;
+    ubRssi=0;
+
     unsigned long uwFreqOffSet;    //RX Freq Offset
     int  uwRSSI;
 
@@ -970,10 +978,8 @@ void ReceiveData(void)
                 rt_kprintf("Receive is");
                 for( int i = 1; i < ubDataLen; i++ )
                 {
-                    rt_kprintf( " %02X", RXBuff[i] );
+                    LOG_RAW( " %02X", RXBuff[i] );
                 }
-                rt_kprintf("\r\n");
-                ubRssi = SpiReadSingleAddressRegister(REG_AX5043_RSSI);
                 ubTepm = SpiReadSingleAddressRegister(REG_AX5043_IRQMASK0);
                 SpiWriteSingleAddressRegister(REG_AX5043_IRQMASK0, ubTepm&0xFE);   // disable FIFO not empty irq
                 break;
@@ -998,9 +1004,8 @@ void ReceiveData(void)
             case AX5043_FIFOCMD_RSSI:
                 if (ubDataLen != 1)
                     goto dropchunk;
-                ubRssi = SpiReadSingleAddressRegister(REG_AX5043_FIFODATA);
-                uwRSSI = ubRssi - 32;
-                LOG_D("Got Rssi is %d\r\n",uwRSSI);
+                ubRssi = SpiReadUnderSingleAddressRegister(REG_AX5043_FIFODATA);
+                LOG_D("Got Rssi is %d\r\n",ubRssi);
                 break;
 
             case AX5043_FIFOCMD_TIMER:
@@ -1025,7 +1030,6 @@ void ReceiveData(void)
         }
     }
     ubDataFlag = ubDataFlag;
-    uwRSSI = uwRSSI;
 }
 MSH_CMD_EXPORT(ReceiveData,ReceiveData);
 //=====================================================================
@@ -1263,7 +1267,7 @@ void Radio_Task_Callback(void *parameter)
                             AX5043ReceiverON();
                             if (RxLen != 0)
                             {
-                                Rx_Done_Callback(RXBuff,RxLen);
+                                Rx_Done_Callback(RXBuff,RxLen,ubRssi);
                             }
                             if(wor_flag)
                             {
