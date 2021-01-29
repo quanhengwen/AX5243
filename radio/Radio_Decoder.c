@@ -344,6 +344,14 @@ void DataSolve(Message buf)
         }
         break;
     }
+    if(buf.Counter==0)
+    {
+        ChangeMaxPower();
+    }
+    else
+    {
+        BackNormalPower();
+    }
     Detect_All_TimeInDecoder(buf.From_ID);
     Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
 }

@@ -33,6 +33,9 @@ void AX5043_Reset(void);
 uint8_t InitAX5043(void);
 void ChangeWorFreq(void);
 void BackNormalFreq(void);
+void ChangeMaxPower(void);
+void BackNormalPower(void);
+
 
 void RdioWaitXtal(void);
 char SetChannel(uint8_t ubNum );
