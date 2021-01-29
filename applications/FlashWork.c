@@ -140,7 +140,7 @@ void Device_RssiChange(uint32_t Device_ID,uint8_t value)
     ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
     rt_free(Temp_KeyBuf);
     rt_free(Temp_ValueBuf);
-    LOG_D("Writing Rssi %ld to key %s\r\n", Device_ID,value);
+    LOG_D("Writing Rssi %d to key %ld\r\n", value,Device_ID);
 }
 uint8_t Device_BatGet(uint32_t Device_ID)
 {

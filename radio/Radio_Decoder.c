@@ -282,7 +282,7 @@ void DataSolve(Message buf)
         LOG_D("Pwr On\r\n");
         if(Check_Valid(buf.From_ID))
         {
-            if((Now_Status==Open||Now_Status==Close) && (Now_Status!=Offline))
+            if((Now_Status==Open||Now_Status==Close||Now_Status==SlaverLowPower) && (Now_Status!=Offline))
             {
                 LOG_D("Pwr On From %ld\r\n",buf.From_ID);
                 //Disable_Warining();
@@ -306,7 +306,7 @@ void DataSolve(Message buf)
         LOG_D("Pwr Off and Now State is %d\r\n",Now_Status);
         if(Check_Valid(buf.From_ID))
         {
-            if(Now_Status==Open||Now_Status==Close)
+            if(Now_Status==Open||Now_Status==Close||Now_Status==SlaverLowPower)
             {
                 LOG_D("Pwr Off From %ld\r\n",buf.From_ID);
                 Disable_Warining();

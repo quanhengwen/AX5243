@@ -117,19 +117,19 @@ void WiFi_Init(void)
     wifi_uart_init();
     wifi_protocol_init();
     wifi_service_init();
-    mcu_reset_wifi();
-    while(mcu_get_reset_wifi_flag()==0&&i--)
-    {
-        LOG_D("Try to reset Wifi,Counter is %d\r\n",i);
-        rt_thread_mdelay(1000);
-    }
-    i=10;
-    mcu_set_wifi_mode(0);
-    while(mcu_get_wifimode_flag()==0&&i--)
-    {
-        LOG_D("Try to Init Wifi,Counter is %d\r\n",i);
-        rt_thread_mdelay(1000);
-    }
+//    mcu_reset_wifi();
+//    while(mcu_get_reset_wifi_flag()==0&&i--)
+//    {
+//        LOG_D("Try to reset Wifi,Counter is %d\r\n",i);
+//        rt_thread_mdelay(1000);
+//    }
+//    i=10;
+//    mcu_set_wifi_mode(0);
+//    while(mcu_get_wifimode_flag()==0&&i--)
+//    {
+//        LOG_D("Try to Init Wifi,Counter is %d\r\n",i);
+//        rt_thread_mdelay(1000);
+//    }
     if(i>0)
     {
         LOG_D("Wifi Init Success\r\n");
