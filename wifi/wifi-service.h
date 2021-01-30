@@ -10,3 +10,6 @@
 void wifi_service_init(void);
 void WariningUpload(uint32_t device_id,uint8_t state);
 void MotoUpload(uint8_t state);
+void Show_WiFi(void);
+void Exit_WiFi(void);
+void Reset_WiFi(void);

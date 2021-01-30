@@ -1107,7 +1107,7 @@ void wifi_test_result(unsigned char result,unsigned char rssi)
  */
 void wifi_status_result(unsigned char result)
 {
-    #error "请自行实现WIFI 工作状态结果代码,完成后请删除该行"
+   // #error "请自行实现WIFI 工作状态结果代码,完成后请删除该行"
     switch(result) {
         case 0:
             //wifi工作状态1

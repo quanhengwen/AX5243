@@ -112,25 +112,13 @@ void wifi_uart_init(void)
 MSH_CMD_EXPORT(wifi_uart_init, wifi_uart_init);
 void WiFi_Init(void)
 {
-    uint8_t i=10;
     wifi_gpio_enable();
     wifi_uart_init();
     wifi_protocol_init();
     wifi_service_init();
-//    mcu_reset_wifi();
-//    while(mcu_get_reset_wifi_flag()==0&&i--)
-//    {
-//        LOG_D("Try to reset Wifi,Counter is %d\r\n",i);
-//        rt_thread_mdelay(1000);
-//    }
-//    i=10;
-//    mcu_set_wifi_mode(0);
-//    while(mcu_get_wifimode_flag()==0&&i--)
-//    {
-//        LOG_D("Try to Init Wifi,Counter is %d\r\n",i);
-//        rt_thread_mdelay(1000);
-//    }
-    if(i>0)
+    mcu_set_wifi_mode(1);
+    rt_thread_mdelay(1000);
+    if(mcu_get_wifimode_flag()==1)
     {
         LOG_D("Wifi Init Success\r\n");
     }

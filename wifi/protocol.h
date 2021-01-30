@@ -38,7 +38,7 @@
 
 //smart和AP共存配网模式的特殊配置，如果不使用此宏定义，则在smart模式和AP模式之间切换
 //#define CONFIG_MODE_CHOOSE        0         //同时打开AP和smart配网，不需要用户切换，网络状态为0x06
-//#define CONFIG_MODE_CHOOSE        1         //只使用AP配网模式
+#define CONFIG_MODE_CHOOSE        1         //只使用AP配网模式
 
 
 /******************************************************************************

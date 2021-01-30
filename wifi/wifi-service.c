@@ -14,6 +14,7 @@
 #include "ulog.h"
 #include "wifi.h"
 #include "wifi-service.h"
+#include "led.h"
 
 #define DBG_TAG "wifi_service"
 #define DBG_LVL DBG_LOG
@@ -21,6 +22,39 @@
 
 static rt_thread_t WiFi_Service_Thread = RT_NULL;
 
+void Show_WiFi(void)
+{
+    beep_start(0,10);//beep 5 times
+    if(mcu_get_wifi_work_state()==0x04)
+    {
+        LOG_D("wifi is ok\r\n");
+    }
+    else
+    {
+        LOG_D("wifi is fail\r\n");
+    }
+}
+MSH_CMD_EXPORT(Show_WiFi,Show_WiFi);
+void Exit_WiFi(void)
+{
+    beep_start(0,11);//beep 3 times
+}
+MSH_CMD_EXPORT(Exit_WiFi,Exit_WiFi);
+void Reset_WiFi(void)
+{
+    beep_start(0,12);//beep 1 times
+    mcu_reset_wifi();
+    rt_thread_mdelay(500);
+    if(mcu_get_reset_wifi_flag()==1)
+    {
+        LOG_D("Wifi Reset Success\r\n");
+    }
+    else
+    {
+        LOG_D("Wifi Reset Fail\r\n");
+    }
+}
+MSH_CMD_EXPORT(Reset_WiFi,Reset_WiFi);
 void service_callback(void *parameter)
 {
     while(1)
