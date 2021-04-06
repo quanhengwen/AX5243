@@ -27,11 +27,6 @@ extern uint8_t ValveStatus;
 extern enum Device_Status Now_Status;
 extern Device_Info Global_Device;
 
-void motoread(void)
-{
-    LOG_D("Moto is %d\r\n",Global_Device.LastFlag);
-}
-MSH_CMD_EXPORT(motoread,motoread);
 void Moto_InitOpen(uint8_t ActFlag)
 {
     LOG_D("Moto Open Init Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
@@ -163,7 +158,7 @@ void Turn1_Timer_Callback(void *parameter)
     {
         LOG_D("Moto1 is Fail\r\n");
         beep_start(0,9);
-        WariningUpload(0,6);
+        WariningUpload(0,0,1);
     }
 }
 void Turn2_Timer_Callback(void *parameter)
@@ -174,7 +169,7 @@ void Turn2_Timer_Callback(void *parameter)
     {
         LOG_D("Moto2 is Fail\r\n");
         beep_start(0,9);
-        WariningUpload(0,6);
+        WariningUpload(0,0,2);
     }
 }
 void Moto_Init(void)

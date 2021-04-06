@@ -186,7 +186,7 @@ inform_dev_del_status内部有#err提示,完成函数后请删除该#err
 并在protocol.c文件local_del_subdev函数内查看结果,
 local_del_subdev内部有#err提示,完成函数后请删除该#err
 ******************************************************************************/
-//#define         LOCAL_SUBDEV_DEL_ENABLE                //开启本地删除子设备
+#define         LOCAL_SUBDEV_DEL_ENABLE                //开启本地删除子设备
 
 /******************************************************************************
                       MCU是否需要支持本地允许/关闭添加子设备
@@ -354,30 +354,33 @@ mcu在wifi模块正确联网后可调用 get_green_time_with_zone() 函数发起
                         1:网关的dp数据点序列号重新定义
           **此为自动生成代码,如在开发平台有相关修改请重新下载MCU_SDK**
 ******************************************************************************/
-//故障状态(只上报)
+//设备开关阀(可下发可上报)
+//备注:开阀方式1：设备自身开关阀
+#define DPID_DEVICE_STATE 101
+//阀门自检(只上报)
 //备注:
-#define DPID_FAIL_STATE 101
-//故障设备ID(只上报)
+#define DPID_DEVICE_CHECK 102
+//主控漏水报警(只上报)
 //备注:
-#define DPID_DEVICE_ID 102
-//阀门状态(可下发可上报)
-//备注:
-#define DPID_VALVE_STATE 103
-//故障清除(只下发)
-//备注:
-#define DPID_CLEAR_ERROR 104
-//信号强度(只上报)
-//备注:
-#define DPID_RSSI 105
-//通信间隔时间(只上报)
-//备注:
-#define DPID_PASTTIME 106
-//电量强度(只上报)
-//备注:
-#define DPID_BAT 107
+#define DPID_DEVICE_ALARM 103
+//门控开关阀(可下发可上报)
+//备注:开阀方式2：门控中的开关执行开关阀
+#define DPID_CONTROL_STATE 104
+//延时开关开关阀(可下发可上报)
+//备注:开阀方式3：延时开关执行开关阀
+#define DPID_DELAY_STATE 106
 //童锁开关(可下发可上报)
 //备注:
 #define DPID_LOCK 108
+//测水线脱落报警(只上报)
+//备注:
+#define DPID_LINE_STATE 109
+//延时开关倒计时(可下发可上报)
+//备注:0:倒计时1h
+//1：倒计时2h
+//2：倒计时3h
+//3：倒计时4h
+#define DPID_DELAY_TIME 110
 
 
 

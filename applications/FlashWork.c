@@ -168,6 +168,7 @@ void Device_BatChange(uint32_t Device_ID,uint8_t value)
 }
 uint8_t Add_Device(uint32_t Device_ID)
 {
+
     uint32_t Num=0;
     Num = Flash_Get_Learn_Nums();
     if(Num>200)return RT_ERROR;
@@ -176,6 +177,7 @@ uint8_t Add_Device(uint32_t Device_ID)
     Global_Device.Num = Num;
     Global_Device.ID[Num] = Device_ID;
     Flash_Key_Change(Num,Device_ID);
+    Device_Add_WiFi(Device_ID);
     return RT_EOK;
 }
 uint8_t Add_DoorDevice(uint32_t Device_ID)
@@ -186,6 +188,7 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
         Num = Flash_Get_Learn_Nums();
         Global_Device.ID[Num] = Device_ID;
         Flash_Key_Change(Num,Device_ID);
+        Device_Add_WiFi(Device_ID);
         Global_Device.DoorID = Num;
         Flash_Key_Change(88888888,Num);
         LOG_D("Replace Learn\r\n");
@@ -200,6 +203,7 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
         Global_Device.Num = Num;
         Global_Device.ID[Num] = Device_ID;
         Flash_Key_Change(Num,Device_ID);
+        Device_Add_WiFi(Device_ID);
         Global_Device.DoorID = Num;
         Flash_Key_Change(88888888,Num);
         LOG_D("New Learn\r\n");
@@ -225,16 +229,9 @@ uint32_t GetDoorID(void)
         return 0;
     }
 }
-uint8_t Delete_Device(uint32_t Device_ID)
+uint8_t Delete_Device(uint32_t Num)
 {
-    uint32_t Num=0;
-    Num = Flash_Get_Learn_Nums();
-    if(Num<1)return RT_ERROR;
-    Global_Device.ID[Num] = 0;
-    Num--;
-    Flash_LearnNums_Change(Num);
-    Global_Device.Num = Num;
-    Flash_Key_Change(Num,Device_ID);
+    Flash_Key_Change(Num,0);
     return RT_EOK;
 }
 uint8_t Update_Device_Bat(uint32_t Device_ID,uint8_t bat)//更新电量
@@ -340,7 +337,7 @@ void Detect_All_Time(void)
             {
                 LOG_D("Device ID %ld is Offline\r\n",Global_Device.ID[num]);
             }
-            WariningUpload(Global_Device.ID[num],5);
+            WariningUpload(Global_Device.ID[num],0,1);
         }
         num--;
     }
@@ -350,6 +347,24 @@ void Detect_All_Time(void)
     }
     Clear_All_Time();
     LOG_D("Detect_All_Time OK\r\n");
+}
+uint8_t Remote_Delete(uint32_t Device_ID)
+{
+    uint16_t num = Global_Device.Num;
+    if(!num)return RT_ERROR;
+    while(num)
+    {
+        if(Global_Device.ID[num]==Device_ID)
+        {
+            Global_Device.ID[num] = 0;
+            Delete_Device(num);
+            LOG_I("Delete ID %ld By WIFI is success\r\n");
+            return RT_EOK;
+        }
+        num--;
+    }
+    LOG_I("Delete ID %ld By WIFI is fail\r\n");
+    return RT_ERROR;
 }
 uint8_t Flash_Get_Key_Valid(uint32_t Device_ID)//查询内存中的ID
 {
@@ -361,6 +376,20 @@ uint8_t Flash_Get_Key_Valid(uint32_t Device_ID)//查询内存中的ID
         num--;
     }
     return RT_ERROR;
+}
+uint8_t Flash_GetRssi(uint32_t Device_ID)//查询内存中的RSSI
+{
+    uint16_t num = Global_Device.Num;
+    if(!num)return RT_ERROR;
+    while(num)
+    {
+        if(Global_Device.ID[num]==Device_ID)
+        {
+            return Global_Device.Rssi[num];
+        }
+        num--;
+    }
+    return 0;
 }
 void Detect_All_TimeInDecoder(uint8_t ID)
 {

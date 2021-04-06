@@ -25,9 +25,9 @@ static rt_thread_t WiFi_Service_Thread = RT_NULL;
 void Show_WiFi(void)
 {
     beep_start(0,10);//beep 5 times
-    if(mcu_get_wifi_work_state()==0x04)
+    if(mcu_get_wifi_work_state()==0x03)
     {
-        LOG_D("wifi is ok\r\n");
+        LOG_D("wifi is AP\r\n");
     }
     else
     {
@@ -42,7 +42,7 @@ void Exit_WiFi(void)
 MSH_CMD_EXPORT(Exit_WiFi,Exit_WiFi);
 void Reset_WiFi(void)
 {
-    beep_start(0,12);//beep 1 times
+    just_ring();
     mcu_reset_wifi();
     rt_thread_mdelay(500);
     if(mcu_get_reset_wifi_flag()==1)

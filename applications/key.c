@@ -160,11 +160,12 @@ void Key_Reponse_Callback(void *parameter)
         }
         else if(K0_Long_Status==RT_EOK)//ON
         {
+            Reset_WiFi();
+            //LOG_D("Now in WiFi Mode\r\n");
             if(Now_Status==Close)
             {
-                LOG_D("Now in WiFi Mode\r\n");
-                Now_Status = WiFi;
-                Show_WiFi();
+//                Now_Status = WiFi;
+//                Show_WiFi();
             }
             else if(Now_Status == WiFi)
             {

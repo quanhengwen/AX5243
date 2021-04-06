@@ -17,7 +17,13 @@ void MasterAlarmWaterDisable(void);
 void MasterStatusChangeToDeAvtive(void);
 void OfflineDisableWarning(void);
 void RadioInitFail(void);
+void Delay_Timer_Init(void);
+void Delay_Enable(void);
+void Delay_Disable(void);
+void KidLock_Enable(void);
+void KidLock_Disable(void);
 uint8_t Detect_Learn(void);
+void Delay_Timer_Open();
 
 typedef struct
 {

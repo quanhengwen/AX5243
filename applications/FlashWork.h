@@ -21,6 +21,8 @@ typedef struct
 
 uint32_t Flash_Get(uint32_t id);
 uint8_t Flash_Get_Key_Valid(uint32_t key);
+uint8_t Flash_GetRssi(uint32_t Device_ID);//查询内存中的RSSI
+uint8_t Remote_Delete(uint32_t Device_ID);
 void Flash_Key_Change(uint32_t key,uint32_t value);
 void Flash_Set(uint8_t id,uint32_t value);
 void Flash_Factory(void);
@@ -42,4 +44,5 @@ uint8_t Device_RssiGet(uint32_t Device_ID);
 void Device_RssiChange(uint32_t Device_ID,uint8_t value);
 uint8_t Device_BatGet(uint32_t Device_ID);
 void Device_BatChange(uint32_t Device_ID,uint8_t value);
+uint8_t Delete_Device(uint32_t Device_ID);
 

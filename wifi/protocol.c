@@ -82,15 +82,17 @@ const char *weather_choose[WEATHER_CHOOSE_CNT] = {
 ******************************************************************************/
 const DOWNLOAD_CMD_S download_cmd[] =
 {
-  {DPID_FAIL_STATE, DP_TYPE_VALUE},
-  {DPID_DEVICE_ID, DP_TYPE_VALUE},
-  {DPID_VALVE_STATE, DP_TYPE_BOOL},
-  {DPID_CLEAR_ERROR, DP_TYPE_BOOL},
-  {DPID_RSSI, DP_TYPE_VALUE},
-  {DPID_PASTTIME, DP_TYPE_VALUE},
-  {DPID_BAT, DP_TYPE_VALUE},
+  {DPID_DEVICE_STATE, DP_TYPE_BOOL},
+  {DPID_DEVICE_CHECK, DP_TYPE_BOOL},
+  {DPID_DEVICE_ALARM, DP_TYPE_BOOL},
+  {DPID_CONTROL_STATE, DP_TYPE_BOOL},
+  {DPID_DELAY_STATE, DP_TYPE_BOOL},
   {DPID_LOCK, DP_TYPE_BOOL},
+  {DPID_LINE_STATE, DP_TYPE_BOOL},
+  {DPID_DELAY_TIME, DP_TYPE_ENUM},
+  
 };
+
 
 
 
@@ -137,32 +139,111 @@ void uart_transmit_output(unsigned char value)
  * @return Null
  * @note   此函数SDK内部需调用，MCU必须实现该函数内数据上报功能，包括只上报和可上报可下发型数据
  */
-void WariningUpload(uint32_t device_id,uint8_t state)
+void WariningUpload(uint32_t device_id,uint8_t state,uint8_t value)
 {
     char *Buf = rt_malloc(20);
+    sprintf(Buf,"%ld",device_id);
     LOG_D("WariningUpload Device ID is %ld,State is %d\r\n",device_id,state);
-   if(device_id>0)
-   {
-       sprintf(Buf,"%ld",device_id);
-       mcu_dp_value_update(DPID_FAIL_STATE,state,Buf,my_strlen(Buf)); //VALUE型数据上报;
-       mcu_dp_value_update(DPID_DEVICE_ID,device_id,Buf,my_strlen(Buf)); //VALUE型数据上报;
-   }
-   else
-   {
-       sprintf(Buf,"%d",0);
-       mcu_dp_value_update(DPID_FAIL_STATE,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
-       mcu_dp_value_update(DPID_DEVICE_ID,Buf,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
-   }
+    if(device_id>0)
+    {
+        //mcu_dp_enum_update(1,value,Buf,my_strlen(Buf)); //BOOL型数据上报;
+        switch(state)
+        {
+            case 0://掉线
+               mcu_dp_bool_update(103,value,Buf,my_strlen(Buf)); //BOOL型数据上报;
+               break;
+            case 1://水浸
+               mcu_dp_enum_update(1,value,Buf,my_strlen(Buf)); //BOOL型数据上报;
+               break;
+            case 2://电量
+               mcu_dp_value_update(102,value,Buf,my_strlen(Buf)); //BOOL型数据上报;
+               break;
+        }
+    }
+    else
+    {
+        switch(state)
+        {
+            case 0://自检
+                mcu_dp_bool_update(DPID_DEVICE_CHECK,value,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
+               break;
+            case 1://漏水
+                mcu_dp_bool_update(DPID_DEVICE_ALARM,value,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
+               break;
+            case 2://掉落
+                mcu_dp_bool_update(DPID_LINE_STATE,value,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
+               break;
+        }
+    }
    rt_free(Buf);
+}
+void Slave_Heart(uint32_t device_id,uint8_t rssi,uint8_t bat)
+{
+    char *Buf = rt_malloc(20);
+    sprintf(Buf,"%ld",device_id);
+    LOG_D("Slave_Heart Device ID is %ld,rssi is %d,bat is %d\r\n",device_id,rssi,bat);
+    mcu_dp_enum_update(101,rssi,Buf,my_strlen(Buf)); //BOOL型数据上报;
+    mcu_dp_value_update(102,bat,Buf,my_strlen(Buf)); //BOOL型数据上报;
+    heart_beat_report(Buf,1);
 }
 void MotoUpload(uint8_t state)
 {
     char *Buf = rt_malloc(20);
     LOG_D("MotoUpload State is %d\r\n",state);
     sprintf(Buf,"%d",0);
-    mcu_dp_value_update(DPID_VALVE_STATE,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+    mcu_dp_bool_update(DPID_DEVICE_STATE,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
     rt_free(Buf);
 }
+void RemoteOpenUpload(uint32_t device_id,uint8_t state)
+{
+    char *Buf = rt_malloc(20);
+    LOG_D("RemoteOpenUpload is upload%d\r\n",state);
+    sprintf(Buf,"%d",device_id);
+    mcu_dp_bool_update(DPID_CONTROL_STATE,state,Buf,my_strlen(Buf)); //VALUE型数据上报;
+    rt_free(Buf);
+}
+void KidLockUp(uint8_t state)
+{
+    char *Buf = rt_malloc(20);
+    LOG_D("RemoteOpenUpload is upload%d\r\n",state);
+    mcu_dp_bool_update(DPID_LOCK,state,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+    rt_free(Buf);
+}
+char *door_pid = {"emnzq3qxwfplx7db"};
+char *slave_pid = {"lnbkva6cip8dw7vy"};
+void Device_Add_WiFi(uint32_t device_id)
+{
+    char *Buf = rt_malloc(20);
+    sprintf(Buf,"%ld",device_id);
+    LOG_D("Device_Add_by WiFi ID is %d\r\n",device_id);
+    if(GetDoorID()==device_id)
+    {
+        gateway_subdevice_add("1.0",door_pid,0,Buf,10,0);
+    }
+    else
+    {
+        gateway_subdevice_add("1.0",slave_pid,0,Buf,10,0);
+    }
+    rt_free(Buf);
+}
+void add_test(void)
+{
+    Device_Add_WiFi(10006000);
+}
+MSH_CMD_EXPORT(add_test,add);
+void Device_Delete_WiFi(uint32_t device_id)
+{
+    char *Buf = rt_malloc(20);
+    sprintf(Buf,"%ld",device_id);
+    LOG_D("Device_Del_by WiFi ID is %d\r\n",device_id);
+    local_subdev_del_cmd(Buf);
+    rt_free(Buf);
+}
+void del_test(void)
+{
+    Device_Delete_WiFi(20022636);
+}
+MSH_CMD_EXPORT(del_test,del);
 void all_data_update(void)
 {
     //#error "请在此处理可下发可上报数据及只上报数据示例,处理完成后删除该行"
@@ -183,28 +264,28 @@ void all_data_update(void)
     //此代码为平台自动生成，请按照实际数据修改每个可下发可上报函数和只上报函数
 //    mcu_dp_value_update(DPID_FAIL_STATE,当前故障状态,子设备ID,子设备ID长度); //VALUE型数据上报;
 //    mcu_dp_value_update(DPID_DEVICE_ID,当前故障设备ID,子设备ID,子设备ID长度); //VALUE型数据上报;
-    mcu_dp_bool_update(DPID_VALVE_STATE,0,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
-    for(uint8_t i=1;i<=Global_Device.Num;i++)
-    {
-        char *Buf = rt_malloc(20);
-        sprintf(Buf,"%ld",Global_Device.ID[i]);
-        mcu_dp_value_update(DPID_RSSI,Global_Device.Rssi[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
-        rt_free(Buf);
-    }
-    for(uint8_t i=1;i<=Global_Device.Num;i++)
-    {
-        char *Buf = rt_malloc(20);
-        sprintf(Buf,"%ld",Global_Device.ID[i]);
-        mcu_dp_value_update(DPID_PASTTIME,Global_Device.ID_Time[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
-        rt_free(Buf);
-    }
-    for(uint8_t i=1;i<=Global_Device.Num;i++)
-    {
-        char *Buf = rt_malloc(20);
-        sprintf(Buf,"%ld",Global_Device.ID[i]);
-        mcu_dp_value_update(DPID_BAT,Global_Device.Bat[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
-        rt_free(Buf);
-    }
+//    mcu_dp_bool_update(DPID_VALVE_STATE,0,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //BOOL型数据上报;
+//    for(uint8_t i=1;i<=Global_Device.Num;i++)
+//    {
+//        char *Buf = rt_malloc(20);
+//        sprintf(Buf,"%ld",Global_Device.ID[i]);
+//        mcu_dp_value_update(DPID_RSSI,Global_Device.Rssi[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+//        rt_free(Buf);
+//    }
+//    for(uint8_t i=1;i<=Global_Device.Num;i++)
+//    {
+//        char *Buf = rt_malloc(20);
+//        sprintf(Buf,"%ld",Global_Device.ID[i]);
+//        mcu_dp_value_update(DPID_PASTTIME,Global_Device.ID_Time[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+//        rt_free(Buf);
+//    }
+//    for(uint8_t i=1;i<=Global_Device.Num;i++)
+//    {
+//        char *Buf = rt_malloc(20);
+//        sprintf(Buf,"%ld",Global_Device.ID[i]);
+//        mcu_dp_value_update(DPID_BAT,Global_Device.Bat[i],Buf,my_strlen(Buf)); //VALUE型数据上报;
+//        rt_free(Buf);
+//    }
 //    mcu_dp_value_update(DPID_RSSI,当前信号强度,子设备ID,子设备ID长度); //VALUE型数据上报;
 //    mcu_dp_value_update(DPID_PASTTIME,当前通信间隔时间,子设备ID,子设备ID长度); //VALUE型数据上报;
 //    mcu_dp_value_update(DPID_BAT,当前电量强度,子设备ID,子设备ID长度); //VALUE型数据上报;
@@ -229,15 +310,15 @@ void all_data_update(void)
 返回参数 : 成功返回:SUCCESS/失败返回:ERROR
 使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
 *****************************************************************************/
-static unsigned char dp_download_valve_state_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+static unsigned char dp_download_device_state_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
 {
     //示例:当前DP类型为BOOL
     unsigned char ret;
     //0:关/1:开
-    unsigned char valve_state;
+    unsigned char device_state;
     
-    valve_state = mcu_get_dp_download_bool(value,length);
-    if(valve_state == 0) {
+    device_state = mcu_get_dp_download_bool(value,length);
+    if(device_state == 0) {
         //开关关
         /*****************************************************************************
         //dp数据处理前需要判断是哪一个子设备id的dp
@@ -257,7 +338,7 @@ static unsigned char dp_download_valve_state_handle(const unsigned char value[],
     }
   
     //处理完DP数据后应有反馈
-    ret = mcu_dp_bool_update(DPID_VALVE_STATE,valve_state, sub_id_buf, sub_id_len);
+    ret = mcu_dp_bool_update(DPID_DEVICE_STATE,device_state, sub_id_buf, sub_id_len);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -271,18 +352,64 @@ static unsigned char dp_download_valve_state_handle(const unsigned char value[],
         : sub_id_buf:子设备id
         : sub_id_len:子设备id数据长度
 返回参数 : 成功返回:SUCCESS/失败返回:ERROR
-使用说明 : 只下发类型,需要在处理完数据后上报处理结果至app
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
 *****************************************************************************/
-static unsigned char dp_download_clear_error_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+static unsigned char dp_download_control_state_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
 {
     //示例:当前DP类型为BOOL
     unsigned char ret;
     //0:关/1:开
-    unsigned char clear_error;
+    unsigned char control_state;
     
-    clear_error = mcu_get_dp_download_bool(value,length);
-    if(clear_error == 0) {
+    control_state = mcu_get_dp_download_bool(value,length);
+    if(control_state == 0) {
         //开关关
+        Warning_Disable();
+        /*****************************************************************************
+        //dp数据处理前需要判断是哪一个子设备id的dp
+        //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
+        if(my_strcmp(sub_id_buf,"1234") == 0) {
+    
+        }else if(my_strcmp(sub_id_buf,"5678") == 0) {
+    
+        }
+
+        //若子设备id是“0000”，则表示网关本身的dp
+        *****************************************************************************/
+  
+    }else {
+        Warning_Disable();
+        //开关开
+    }
+  
+    //处理完DP数据后应有反馈
+    ret = mcu_dp_bool_update(DPID_CONTROL_STATE,control_state, sub_id_buf, sub_id_len);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_delay_state_handle
+功能描述 : 针对DPID_DELAY_STATE的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+        : sub_id_buf:子设备id
+        : sub_id_len:子设备id数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_delay_state_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+{
+    //示例:当前DP类型为BOOL
+    unsigned char ret;
+    //0:关/1:开
+    unsigned char delay_state;
+    
+    delay_state = mcu_get_dp_download_bool(value,length);
+    if(delay_state == 0) {
+        //开关关
+        Delay_Timer_Close();
         /*****************************************************************************
         //dp数据处理前需要判断是哪一个子设备id的dp
         //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
@@ -295,11 +422,11 @@ static unsigned char dp_download_clear_error_handle(const unsigned char value[],
         //若子设备id是“0000”，则表示网关本身的dp
         *****************************************************************************/
     }else {
+        Delay_Timer_Open();
         //开关开
     }
-    Warning_Disable();
     //处理完DP数据后应有反馈
-    ret = mcu_dp_bool_update(DPID_CLEAR_ERROR,clear_error, sub_id_buf, sub_id_len);
+    ret = mcu_dp_bool_update(DPID_DELAY_STATE,delay_state, sub_id_buf, sub_id_len);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -325,6 +452,7 @@ static unsigned char dp_download_lock_handle(const unsigned char value[], unsign
     lock = mcu_get_dp_download_bool(value,length);
     if(lock == 0) {
         //开关关
+        KidLock_Disable();
         /*****************************************************************************
         //dp数据处理前需要判断是哪一个子设备id的dp
         //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
@@ -338,11 +466,64 @@ static unsigned char dp_download_lock_handle(const unsigned char value[], unsign
         *****************************************************************************/
   
     }else {
+        KidLock_Enable();
         //开关开
     }
   
     //处理完DP数据后应有反馈
     ret = mcu_dp_bool_update(DPID_LOCK,lock, sub_id_buf, sub_id_len);
+    if(ret == SUCCESS)
+        return SUCCESS;
+    else
+        return ERROR;
+}
+/*****************************************************************************
+函数名称 : dp_download_delay_time_handle
+功能描述 : 针对DPID_DELAY_TIME的处理函数
+输入参数 : value:数据源数据
+        : length:数据长度
+        : sub_id_buf:子设备id
+        : sub_id_len:子设备id数据长度
+返回参数 : 成功返回:SUCCESS/失败返回:ERROR
+使用说明 : 可下发可上报类型,需要在处理完数据后上报处理结果至app
+*****************************************************************************/
+static unsigned char dp_download_delay_time_handle(const unsigned char value[], unsigned short length, unsigned char *sub_id_buf, unsigned char sub_id_len)
+{
+    //示例:当前DP类型为ENUM
+    unsigned char ret;
+    unsigned char delay_time;
+    
+    delay_time = mcu_get_dp_download_enum(value,length);
+    switch(delay_time) {
+        case 0:
+            /*****************************************************************************
+            //dp数据处理前需要判断是哪一个子设备id的dp
+            //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
+            if(my_strcmp(sub_id_buf,"1234") == 0){
+            
+            }else if(my_strcmp(sub_id_buf,"5678") == 0){
+            
+            }
+            //若子设备id是“0000”，则表示网关本身的dp
+            *****************************************************************************/
+        break;
+        
+        case 1:
+        break;
+        
+        case 2:
+        break;
+        
+        case 3:
+        break;
+        
+        default:
+    
+        break;
+    }
+    
+    //处理完DP数据后应有反馈
+    ret = mcu_dp_enum_update(DPID_DELAY_TIME, delay_time, sub_id_buf, sub_id_len);
     if(ret == SUCCESS)
         return SUCCESS;
     else
@@ -376,18 +557,26 @@ unsigned char dp_download_handle(unsigned char dpid,const unsigned char value[],
     ****************************************************************/
     unsigned char ret;
     switch(dpid) {
-        case DPID_VALVE_STATE:
-            //阀门状态处理函数
+        case DPID_DEVICE_STATE:
+            //设备开关阀处理函数
             LOG_D("Got Downlink With Valve\r\n");
-            ret = dp_download_valve_state_handle(value,length,sub_id_buf,sub_id_len);
+            ret = dp_download_device_state_handle(value,length,sub_id_buf,sub_id_len);
         break;
-        case DPID_CLEAR_ERROR:
-            //故障清除处理函数
-            ret = dp_download_clear_error_handle(value,length,sub_id_buf,sub_id_len);
+        case DPID_CONTROL_STATE:
+            //门控开关阀处理函数
+            ret = dp_download_control_state_handle(value,length,sub_id_buf,sub_id_len);
+        break;
+        case DPID_DELAY_STATE:
+            //延时开关开关阀处理函数
+            ret = dp_download_delay_state_handle(value,length,sub_id_buf,sub_id_len);
         break;
         case DPID_LOCK:
             //童锁开关处理函数
             ret = dp_download_lock_handle(value,length,sub_id_buf,sub_id_len);
+        break;
+        case DPID_DELAY_TIME:
+            //延时开关倒计时处理函数
+            ret = dp_download_delay_time_handle(value,length,sub_id_buf,sub_id_len);
         break;
 
         default:
@@ -465,26 +654,26 @@ void subdevice_delete(unsigned char* data_buf,unsigned short data_len)
         goto EXIT_ERR;
     }
     sub_id = item->valuestring;
-
-    item = cJSON_GetObjectItem(root, "devkey");
-    if(NULL == item){
-        //可在此添加提示信息，如：printf("xxx");
-        goto EXIT_ERR;
-    }
-    devkey = item->valuestring;
-    
-    item = cJSON_GetObjectItem(root, "tp");
-    if(NULL == item){
-        //可在此添加提示信息，如：printf("xxx");
-        goto EXIT_ERR;
-    }
-    tp = item->valueint;
+//
+//    item = cJSON_GetObjectItem(root, "devkey");
+//    if(NULL == item){
+//        //可在此添加提示信息，如：printf("xxx");
+//        //goto EXIT_ERR;
+//    }
+//    devkey = item->valuestring;
+//
+//    item = cJSON_GetObjectItem(root, "tp");
+//    if(NULL == item){
+//        //可在此添加提示信息，如：printf("xxx");
+//        //goto EXIT_ERR;
+//    }
+//    tp = item->valueint;
 
     ///////////////请在此处根据获取到的相关数据删除对应的子设备/////////////////
     //sub_id: 子设备id
     //devkey: 子设备key
     //tp: 移除类型  0:移除子设备  1:APP恢复出厂设置
-    
+    Remote_Delete(atol(sub_id));
     
     
     cJSON_Delete(root);
@@ -551,7 +740,7 @@ EXIT_ERR:
  */
 void group_subdev_add(unsigned char *data_buf, unsigned short data_len)
 {
-    #error "请自行实现群组子设备加入代码,完成后请删除该行"
+    //#error "请自行实现群组子设备加入代码,完成后请删除该行"
     cJSON *root = NULL,*item = NULL,*cids_arr = NULL;
     unsigned int i = 0,cids_arr_sz = 0, send_cids_arr_sz = 0;
     
@@ -676,7 +865,7 @@ EXIT1:
  */
 void group_subdev_del(unsigned char *data_buf, unsigned short data_len)
 {
-    #error "请自行实现群组子设备删除代码,完成后请删除该行"
+   // #error "请自行实现群组子设备删除代码,完成后请删除该行"
     cJSON *root = NULL,*item = NULL,*cids_arr = NULL;
     unsigned int i = 0,cids_arr_sz = 0, send_cids_arr_sz = 0;
       
@@ -1185,7 +1374,7 @@ void inform_dev_del_status(unsigned char result)
  */
 void local_del_subdev(unsigned char result)
 {
-    #error "请自行实现wifi功能测试成功/失败代码,完成后请删除该行"
+    //#error "请自行实现wifi功能测试成功/失败代码,完成后请删除该行"
     if(result == 0) {
         //测试成功
     }else {
