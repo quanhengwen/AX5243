@@ -17,6 +17,10 @@
 
 #include "wifi.h"
 
+#define DBG_TAG "wifi_api"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
+
 /**
  * @brief  hex转bcd
  * @param[in] {Value_H} 高字节

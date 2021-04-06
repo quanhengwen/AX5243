@@ -23,7 +23,6 @@ struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置�
 
 #define WiFi_UART_NAME                   "uart1"
 
-
 #define DBG_TAG "wifi_uart"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>

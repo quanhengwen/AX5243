@@ -50,7 +50,7 @@ static uint8_t is_initialized = 0;
 static void agile_led_default_compelete_callback(agile_led_t *led)
 {
     RT_ASSERT(led);
-    LOG_D("led pin:%d compeleted.", led->pin);
+    //LOG_D("led pin:%d compeleted.", led->pin);
 }
 
 /**
