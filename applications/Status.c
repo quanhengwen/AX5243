@@ -27,13 +27,7 @@ extern enum Device_Status Now_Status;
 extern uint8_t ValveStatus;
 extern uint16_t Radio_Counter;
 
-typedef struct
-{
-    uint8_t warning_id;
-    uint8_t last_id;
-    uint8_t priority;
-    void (*callback)(void*);
-}WariningEvent;
+
 
 WariningEvent NowStatusEvent;
 WariningEvent SlaverLowPowerEvent;
@@ -130,6 +124,29 @@ void MasterAlarmWaterDisable(void)
     {
         RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,0);
     }
+}
+rt_timer_t Delay_Timer = RT_NULL;
+void Delay_Timer_Callback(void *parameter)
+{
+    LOG_D("Delay_Timer_Callback is Now\r\n");
+    Moto_CloseByWifi();
+}
+void Delay_Timer_Init(void)
+{
+    LOG_D("Delay_Timer_Init Success\r\n");
+    Delay_Timer = rt_timer_create("Delay_Timer", Delay_Timer_Callback, RT_NULL, 3*60*60*1000,RT_TIMER_FLAG_SOFT_TIMER|RT_TIMER_FLAG_ONE_SHOT);
+}
+MSH_CMD_EXPORT(Delay_Timer_Init,Delay_Timer_Init);
+void Delay_Timer_Open(void)
+{
+    LOG_D("Delay_Timer is Open\r\n");
+    rt_timer_start(Delay_Timer);
+}
+MSH_CMD_EXPORT(Delay_Timer_Open,Delay_Timer_Open);
+void Delay_Timer_Close(void)
+{
+    LOG_D("Delay_Timer is Close\r\n");
+    rt_timer_stop(Delay_Timer);
 }
 void KidLock_Enable(void)
 {

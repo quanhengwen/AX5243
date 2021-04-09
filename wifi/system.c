@@ -15,6 +15,9 @@
 
 #include "wifi.h"
 
+#define DBG_TAG "wifi_sys"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
 
 volatile unsigned char wifi_data_process_buf[PROTOCOL_HEAD + WIFI_DATA_PROCESS_LMT];      //串口数据处理缓存
 volatile unsigned char wifi_uart_rx_buf[PROTOCOL_HEAD + WIFI_UART_RECV_BUF_LMT];          //串口接收缓存

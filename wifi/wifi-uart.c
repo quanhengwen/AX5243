@@ -15,10 +15,6 @@
 #include "wifi.h"
 #include "wifi-service.h"
 
-#define DBG_TAG "wifi-uart"
-#define DBG_LVL DBG_LOG
-#include <rtdbg.h>
-
 /* 用于接收消息的信号量 */
 static struct rt_semaphore rx_sem;
 static rt_device_t serial;
@@ -27,10 +23,14 @@ struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置�
 
 #define WiFi_UART_NAME                   "uart1"
 
+#define DBG_TAG "wifi_uart"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
+
 void wifi_gpio_enable(void)
 {
     rt_pin_mode(WIFIEN,PIN_MODE_OUTPUT);
-    rt_pin_write(15,1);
+    rt_pin_write(WIFIEN,1);
 }
 /* 接收数据回调函数 */
 static rt_err_t uart_rx_ind(rt_device_t dev, rt_size_t size)
@@ -65,7 +65,6 @@ void data_parsing(void)
         ch = uart_sample_get_char();
         uart_receive_input(ch);
         //LOG_D("GET Data is %X\r\n",ch);
-        //rt_device_write(serial,0,&ch,1);
     }
 }
 void WiFi_Byte_Send(uint8_t data)
@@ -110,15 +109,29 @@ void wifi_uart_init(void)
     }
 }
 MSH_CMD_EXPORT(wifi_uart_init, wifi_uart_init);
+rt_timer_t Wifi_Init_Timer = RT_NULL;
+void Wifi_Init_Timer_Callback(void *parameter)
+{
+    LOG_D("Wifi State is %d\r\n",mcu_get_wifi_work_state());
+    if(mcu_get_wifi_work_state()==0xFF)
+    {
+        LOG_D("No WiFi\r\n");
+    }
+    else if(mcu_get_wifi_work_state()==1)
+    {
+        LOG_D("Wifi is AP Mode\r\n");
+    }
+    else if(mcu_get_wifi_work_state()==2||3||4)
+    {
+        LOG_D("Wifi Init Success\r\n");
+    }
+}
 void WiFi_Init(void)
 {
-    uint8_t stat;
-    wifi_gpio_enable();
-    wifi_uart_init();
     wifi_protocol_init();
+    wifi_uart_init();
     wifi_service_init();
-    mcu_set_wifi_mode(0);
-    rt_thread_mdelay(100);
-    stat = mcu_get_wifimode_flag();
-    if(stat)LOG_D("Wifi Init Success\r\n"); else LOG_D("Wifi Init Fail\r\n");
+    wifi_gpio_enable();
+    Wifi_Init_Timer = rt_timer_create("Wifi_Init",Wifi_Init_Timer_Callback,RT_NULL,12000,RT_TIMER_FLAG_SOFT_TIMER|RT_TIMER_FLAG_ONE_SHOT);
+    rt_timer_start(Wifi_Init_Timer);
 }

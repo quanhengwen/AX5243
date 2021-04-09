@@ -19,7 +19,8 @@ enum Device_Status
     MasterWaterAlarmActive,
     MasterWaterAlarmDeActive,
     Learn,
-    Offline
+    Offline,
+    WiFi
 };
 void Key_Reponse(void);
 

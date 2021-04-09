@@ -43,13 +43,11 @@ void Key_Init(void)
 void K0_Sem_Release(void *parameter)
 {
     rt_sem_release(K0_Sem);
-    //key_down();
     LOG_D("K0 is Down\r\n");
 }
 void K1_Sem_Release(void *parameter)
 {
     rt_sem_release(K1_Sem);
-    //key_down();
     LOG_D("K1 is Down\r\n");
 }
 void K0_LongSem_Release(void *parameter)
@@ -59,7 +57,6 @@ void K0_LongSem_Release(void *parameter)
         if(K0_Long_Sem_Counter>6)
         {
             K0_OnceFlag=1;
-            //key_down();
             rt_sem_release(K0_Long_Sem);
             LOG_D("K0 is Long\r\n");
         }
@@ -76,7 +73,6 @@ void K1_LongSem_Release(void *parameter)
         if(K1_Long_Sem_Counter>6)
         {
             K1_OnceFlag=1;
-            //key_down();
             if(K0_Long_Sem_Counter>5)
             {
                 rt_sem_release(K0_K1_Long_Sem);

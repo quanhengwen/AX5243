@@ -14,6 +14,7 @@
 #include "key.h"
 #include "moto.h"
 #include "flashwork.h"
+#include "wifi-service.h"
 
 #define DBG_TAG "moto"
 #define DBG_LVL DBG_LOG
@@ -26,14 +27,9 @@ extern uint8_t ValveStatus;
 extern enum Device_Status Now_Status;
 extern Device_Info Global_Device;
 
-void motoread(void)
+void Moto_InitOpen(uint8_t ActFlag)
 {
-    LOG_D("Moto is %d\r\n",Global_Device.LastFlag);
-}
-MSH_CMD_EXPORT(motoread,motoread);
-void Moto_Open(uint8_t ActFlag)
-{
-    LOG_D("Moto Open Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
+    LOG_D("Moto Open Init Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
     if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOpen)
     {
         LOG_D("Moto is Open\r\n");
@@ -61,6 +57,38 @@ void Moto_Open(uint8_t ActFlag)
         LOG_D("No permissions to Open\r\n");
     }
 }
+void Moto_Open(uint8_t ActFlag)
+{
+    LOG_D("Moto Open Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
+    if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOpen)
+    {
+        LOG_D("Moto is Open\r\n");
+        Now_Status = Open;
+        led_Long_Start(1);//绿灯
+        ValveStatus=1;
+        Global_Device.LastFlag = ActFlag;
+        Flash_Moto_Change(ActFlag);
+        rt_pin_mode(Moto,0);
+        rt_pin_write(Moto,1);
+        MotoUpload(1);
+    }
+    else if(Global_Device.LastFlag != OtherOff )
+    {
+        LOG_D("Moto is Open\r\n");
+        Now_Status = Open;
+        led_Long_Start(1);//绿灯
+        ValveStatus=1;
+        Global_Device.LastFlag = ActFlag;
+        Flash_Moto_Change(ActFlag);
+        rt_pin_mode(Moto,0);
+        rt_pin_write(Moto,1);
+        MotoUpload(1);
+    }
+    else {
+        beep_start(0,7);//蜂鸣器三下
+        LOG_D("No permissions to Open\r\n");
+    }
+}
 void Moto_Close(uint8_t ActFlag)
 {
     LOG_D("Moto Close Now is is %d , act is %d\r\n",Global_Device.LastFlag,ActFlag);
@@ -74,6 +102,7 @@ void Moto_Close(uint8_t ActFlag)
         Flash_Moto_Change(ActFlag);
         rt_pin_mode(Moto,0);
         rt_pin_write(Moto,0);
+        MotoUpload(0);
     }
     else if(Global_Device.LastFlag == OtherOff && ActFlag == OtherOff)
     {
@@ -86,6 +115,30 @@ void Moto_Close(uint8_t ActFlag)
         beep_start(0,7);//蜂鸣器三下
         LOG_D("No permissions to Off\r\n");
     }
+}
+void Moto_OpenByWifi(void)
+{
+    LOG_D("Moto is OpenByWifi\r\n");
+    Now_Status = Open;
+    led_Long_Start(1);//绿灯
+    ValveStatus=1;
+    Global_Device.LastFlag = NormalOpen;
+    Flash_Moto_Change(NormalOpen);
+    rt_pin_mode(Moto,0);
+    rt_pin_write(Moto,1);
+    MotoUpload(1);
+}
+void Moto_CloseByWifi(void)
+{
+    LOG_D("Moto is CloseByWifi\r\n");
+    Now_Status = Close;
+    led_Stop(1);//绿灯
+    ValveStatus=0;
+    Global_Device.LastFlag = NormalOff;
+    Flash_Moto_Change(NormalOff);
+    rt_pin_mode(Moto,0);
+    rt_pin_write(Moto,0);
+    MotoUpload(0);
 }
 void Turn1_Edge_Callback(void *parameter)
 {
@@ -105,7 +158,7 @@ void Turn1_Timer_Callback(void *parameter)
     {
         LOG_D("Moto1 is Fail\r\n");
         beep_start(0,9);
-        //上报
+        WariningUpload(0,0,1);
     }
 }
 void Turn2_Timer_Callback(void *parameter)
@@ -116,7 +169,7 @@ void Turn2_Timer_Callback(void *parameter)
     {
         LOG_D("Moto2 is Fail\r\n");
         beep_start(0,9);
-        //上报
+        WariningUpload(0,0,2);
     }
 }
 void Moto_Init(void)
@@ -130,12 +183,12 @@ void Moto_Init(void)
     just_ring();
     if(Global_Device.LastFlag != OtherOff)
     {
-        Moto_Open(Global_Device.LastFlag);
+        Moto_InitOpen(Global_Device.LastFlag);
     }
     else if(Global_Device.LastFlag == 0)
     {
         Global_Device.LastFlag = NormalOpen;
-        Moto_Open(NormalOpen);
+        Moto_InitOpen(NormalOpen);
     }
     LOG_D("Moto is Init,Flag is %d\r\n",Global_Device.LastFlag);
 }

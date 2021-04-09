@@ -221,6 +221,50 @@ void beep_start(uint8_t led_id,int mode)
             agile_led_start(led0);
         }
         break;
+    case 10://短叫五声
+        agile_led_set_light_mode(beep, "100,300", 4);
+        agile_led_set_light_mode(led1, "100,300", 4);
+        agile_led_set_light_mode(led0, "100,300", 4);
+        agile_led_start(beep);
+        agile_led_start(led1);
+        agile_led_start(led0);
+        break;
+    case 11://短叫三声
+        agile_led_set_light_mode(beep, "100,300", 2);
+        agile_led_set_light_mode(led1, "100,300", 2);
+        agile_led_set_light_mode(led0, "100,300", 2);
+        agile_led_start(beep);
+        agile_led_start(led1);
+        agile_led_start(led0);
+    case 12://短叫三声
+        agile_led_set_light_mode(beep, "100,300", 1);
+        agile_led_set_light_mode(led1, "100,300", 1);
+        agile_led_set_light_mode(led0, "100,300", 1);
+        agile_led_start(beep);
+        agile_led_start(led1);
+        agile_led_start(led0);
+    case 13://慢闪
+        if(led_id)
+        {
+            agile_led_set_light_mode(led1, "200,400", -1);
+            agile_led_start(led1);
+        }
+        else
+        {
+            agile_led_set_light_mode(led0, "200,400", -1);
+            agile_led_start(led0);
+        }
+    case 14://快闪
+        if(led_id)
+        {
+            agile_led_set_light_mode(led1, "200,100", -1);
+            agile_led_start(led1);
+        }
+        else
+        {
+            agile_led_set_light_mode(led0, "200,100", -1);
+            agile_led_start(led0);
+        }
     }
 }
 void beep_stop(void)

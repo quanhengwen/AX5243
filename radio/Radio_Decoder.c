@@ -25,6 +25,7 @@
 #include "led.h"
 #include "key.h"
 #include "pin_config.h"
+#include "wifi-service.h"
 
 #define DBG_TAG "radio_decoder"
 #define DBG_LVL DBG_LOG
@@ -122,12 +123,6 @@ void Stop_Learn(void)
     if(ValveStatus)Moto_Open(NormalOpen);else Moto_Close(NormalOff);
     LOG_D("Learn timer is stop\r\n");
 }
-void learn_test(void)
-{
-    Add_Device(20022636);
-    Add_DoorDevice(33333333);
-}
-MSH_CMD_EXPORT(learn_test,learn_test);
 void Device_Learn(Message buf)
 {
     switch(buf.Data)
@@ -204,11 +199,13 @@ void DataSolve(Message buf)
             {
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,2);
                 Warning_Enable_Num(1);
+                WariningUpload(buf.From_ID,2,1);
             }
             else
             {
                 Update_Device_Bat(buf.From_ID,buf.Data);//写入电量
                 RadioEnqueue(0,buf.From_ID,buf.Counter,2,0);
+                Slave_Heart(buf.From_ID,Flash_GetRssi(buf.From_ID),buf.Data);
                 //Disable_Warining();
             }
             LOG_D("Handshake With %ld\r\n",buf.From_ID);
@@ -267,6 +264,7 @@ void DataSolve(Message buf)
                             RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
                         }
                         Enable_Warining();
+                        WariningUpload(buf.From_ID,1,1);
                     }
                 }
             }
@@ -280,7 +278,8 @@ void DataSolve(Message buf)
         LOG_D("Pwr On\r\n");
         if(Check_Valid(buf.From_ID))
         {
-            if((Now_Status==Open||Now_Status==Close) && (Now_Status!=Offline))
+            RemoteOpenUpload(buf.From_ID,1);
+            if((Now_Status==Open||Now_Status==Close||Now_Status==SlaverLowPower) && (Now_Status!=Offline))
             {
                 LOG_D("Pwr On From %ld\r\n",buf.From_ID);
                 //Disable_Warining();
@@ -304,7 +303,8 @@ void DataSolve(Message buf)
         LOG_D("Pwr Off and Now State is %d\r\n",Now_Status);
         if(Check_Valid(buf.From_ID))
         {
-            if(Now_Status==Open||Now_Status==Close)
+            RemoteOpenUpload(buf.From_ID,0);
+            if(Now_Status==Open||Now_Status==Close||Now_Status==SlaverLowPower)
             {
                 LOG_D("Pwr Off From %ld\r\n",buf.From_ID);
                 Disable_Warining();
@@ -330,10 +330,13 @@ void DataSolve(Message buf)
         LOG_D("Kid Lock!\r\n");
         if(Check_Valid(buf.From_ID))
         {
-            if(GetDoorID()==buf.From_ID)//是否为主控的回包
+            if(GetDoorID()==buf.From_ID)//是否为门控的包
             {
-                LOG_D("RECV KidLock 7%d From Door\r\n",buf.Data);
+                LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
                 KidLock = buf.Data;
+                KidLockUp(KidLock);
+                //RadioEnqueue(1,buf.From_ID,buf.Counter,7,KidLock);
+                //KidLockUp(KidLock);
             }
         }
         else
@@ -341,16 +344,32 @@ void DataSolve(Message buf)
             LOG_D("Not Include This Device\r\n");
         }
         break;
+    case 8://延迟
+        LOG_D("Delay Open!\r\n");
+        if(Check_Valid(buf.From_ID))
+        {
+            //LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
+            Delay_Timer_Open();
+            RadioEnqueue(1,buf.From_ID,buf.Counter,8,0);
+        }
+        else
+        {
+            LOG_D("Not Include This Device\r\n");
+        }
+        break;
+    }
+    if(buf.Counter==0)
+    {
+        ChangeMaxPower();
+    }
+    else
+    {
+        BackNormalPower();
     }
     Detect_All_TimeInDecoder(buf.From_ID);
     Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
 }
-void status_serach(void)
-{
-    LOG_D("Status is %d\r\n",Now_Status);
-}
-MSH_CMD_EXPORT(status_serach,status_serach);
-void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
+void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len,int8_t rssi)
 {
     Message Rx_message;
     LOG_D("Recv ok\r\n");
@@ -370,5 +389,7 @@ void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
             DataSolve(Rx_message);
         }
         Radio_Counter = Rx_message.Counter;
+        Update_Device_Rssi(Rx_message.From_ID,rssi);
     }
+
 }

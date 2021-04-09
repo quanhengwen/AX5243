@@ -18,6 +18,7 @@
 #include "flashwork.h"
 #include "rthw.h"
 #include "status.h"
+#include "wifi-service.h"
 
 #define DBG_TAG "key"
 #define DBG_LVL DBG_LOG
@@ -95,6 +96,8 @@ void Key_Reponse_Callback(void *parameter)
                 break;
             case Offline:
                 break;
+            case WiFi:
+                break;
             }
         }
         else if(K1_Status==RT_EOK)//OFF
@@ -144,6 +147,8 @@ void Key_Reponse_Callback(void *parameter)
                 break;
             case Offline:
                 break;
+            case WiFi:
+                break;
             }
         }
         else if(K0_K1_Status==RT_EOK)
@@ -152,6 +157,22 @@ void Key_Reponse_Callback(void *parameter)
             beep_start(0,8);//蜂鸣器5次
             rt_thread_mdelay(2500);
             rt_hw_cpu_reset();
+        }
+        else if(K0_Long_Status==RT_EOK)//ON
+        {
+            Reset_WiFi();
+            //LOG_D("Now in WiFi Mode\r\n");
+            if(Now_Status==Close)
+            {
+//                Now_Status = WiFi;
+//                Show_WiFi();
+            }
+            else if(Now_Status == WiFi)
+            {
+                LOG_D("Now Exit WiFi Mode\r\n");
+                Now_Status = Close;
+                Exit_WiFi();
+            }
         }
         else if(K1_Long_Status==RT_EOK)//OFF
         {
@@ -163,6 +184,10 @@ void Key_Reponse_Callback(void *parameter)
             else if(Now_Status==Learn)
             {
                 Stop_Learn();
+            }
+            else if(Now_Status==WiFi)
+            {
+                Reset_WiFi();
             }
             else
             {

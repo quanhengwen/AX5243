@@ -18,5 +18,6 @@ void WorSend(uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data);
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data);
 void RadioDequeueTaskInit(void);
 void SendWithOldBuff(void);
+void FreqRefresh_Init(void);
 
 #endif /* RADIO_RADIO_ENCODER_H_ */

@@ -24,6 +24,7 @@
 #include <rtdbg.h>
 
 rt_thread_t Radio_QueueTask = RT_NULL;
+rt_timer_t FreqRefresh = RT_NULL;
 
 uint32_t Self_Id = 0;
 uint32_t Self_Default_Id = 10000001;
@@ -66,13 +67,20 @@ void Check_Wor_Recv(uint32_t From_ID,uint8_t Command,uint8_t Data)
         LOG_D("Wor Recv Verify Fail\r\n");
     }
 }
-
+void FreqRefresh_Callback(void *parameter)
+{
+    BackNormalFreq();
+}
+void FreqRefresh_Init(void)
+{
+    FreqRefresh = rt_timer_create("FreqRefresh",FreqRefresh_Callback,RT_NULL,2000,RT_TIMER_FLAG_SOFT_TIMER|RT_TIMER_FLAG_ONE_SHOT);
+}
 void Tx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len)
 {
     if(WorCheck.SendFlag)
     {
         WorCheck.SendFlag = 0;
-        BackNormalFreq();
+        rt_timer_start(FreqRefresh);
         beepback();
     }
     LOG_D("Send ok\r\n");
@@ -203,7 +211,7 @@ void RadioDequeue(void *paramaeter)
             case 1:
                 WorSend(Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
                 LOG_D("Wor Send With Now Num %d,Target Num is %d,Target_Id %ld,counter %d,command %d,data %d\r\n",Main_Queue.NowNum,Main_Queue.TargetNum,Main_Queue.Taget_Id[Main_Queue.NowNum],Main_Queue.counter[Main_Queue.NowNum],Main_Queue.Command[Main_Queue.NowNum],Main_Queue.Data[Main_Queue.NowNum]);
-                rt_thread_mdelay(9000);
+                rt_thread_mdelay(12000);
                 break;
             }
             LOG_D("Dequeue Success\r\n");
