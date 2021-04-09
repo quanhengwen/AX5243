@@ -65,8 +65,8 @@ uint8_t axradio_freq_select = 1;
 uint8_t axradio_freq_now = 1;
 uint8_t axradio_power_now = 0;
 uint32_t axradio_txbuffer_cnt = 0;
-uint32_t axradio_phy_chanfreq[2] = {0x10b62763,0x10b81f83};//434.5,434.7
-
+//uint32_t axradio_phy_chanfreq[2] = {0x10b62763,0x10b81f83};//434.5,434.7
+uint32_t axradio_phy_chanfreq[2] = {0X10AE46E4,0x10b81f83};//433.7,434.7
 extern uint32_t Self_Id;
 
 const uint16_t RegisterVaule[][2]=
@@ -1063,34 +1063,6 @@ void Wor_send(uint8_t *Buf, uint8_t u8Len)
     axradio_txbuffer_cnt = 150;
     transmit_packet_task(Buf,u8Len);
 }
-void wor_test1(void)
-{
-    WorSend(28000001, 30, 4, 1);
-}
-MSH_CMD_EXPORT(wor_test1,wor_test1);
-void wor_test2(void)
-{
-    WorSend(28000001, 30, 4, 0);
-}
-MSH_CMD_EXPORT(wor_test2,wor_test2);
-void radio_send1(void)
-{
-    uint8_t buf[]={0xA,0xB,0xC,0xD,0xE,0xF};
-    transmit_packet_task(buf,sizeof(buf));
-}
-MSH_CMD_EXPORT(radio_send1,radio_send1);
-void radio_send2(void)
-{
-    uint8_t buf[]={0x7b,0x31,0x30,0x30,0x31,0x30,0x38,0x36,0x31,0x2c,0x32,0x30,0x30,0x32,0x32,0x36,0x33,0x36,0x2c,0x30,0x30,0x32,0x2c,0x30,0x35,0x2c,0x30,0x7d,0x46,0x35,0x0D,0x0A};
-    transmit_packet_task(buf,sizeof(buf));
-}
-MSH_CMD_EXPORT(radio_send2,radio_send2);
-void radio_send3(void)
-{
-    uint8_t buf[]={0x7b,0x31,0x30,0x30,0x31,0x30,0x38,0x36,0x31,0x2c,0x32,0x30,0x30,0x32,0x32,0x36,0x33,0x36,0x2c,0x30,0x30,0x32,0x2c,0x30,0x36,0x2c,0x30,0x7d,0x46,0x36,0x0D,0x0A};
-    transmit_packet_task(buf,sizeof(buf));
-}
-MSH_CMD_EXPORT(radio_send3,radio_send3);
 static void TransmitData(void)
 {
     uint8_t ubFreeCnt;
@@ -1203,18 +1175,6 @@ static void TransmitData(void)
     fifocommit:
         SpiWriteSingleAddressRegister(REG_AX5043_FIFOSTAT, 4); // commit
 }
-void send_t_callback(void *parameter)
-{
-    axradio_txbuffer_cnt = 112;
-    RadioSend(10010861,0,5,0);
-}
-void send_start(void)
-{
-    rt_timer_t send_t = RT_NULL;
-    send_t = rt_timer_create("send", send_t_callback,RT_NULL, 7400, RT_TIMER_FLAG_PERIODIC|RT_TIMER_FLAG_SOFT_TIMER);
-    rt_timer_start(send_t);
-}
-MSH_CMD_EXPORT(send_start,send_start)
 void Receive_ISR(void *parameter)
 {
     rt_sem_release(Radio_IRQ_Sem);
@@ -1358,6 +1318,7 @@ void Radio_Task_Init(void)
     AX5043ReceiverON();         //接收开启
     //readirq();
     RadioDequeueTaskInit();
+    FreqRefresh_Init();
     LOG_D("Radio Init success,Self ID is %ld\r\n",Self_Id);
 }
 /********************************the end of file***********************/

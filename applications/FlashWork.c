@@ -164,11 +164,10 @@ void Device_BatChange(uint32_t Device_ID,uint8_t value)
     ef_set_env(Temp_KeyBuf, Temp_ValueBuf);
     rt_free(Temp_KeyBuf);
     rt_free(Temp_ValueBuf);
-    LOG_D("Writing Rssi %ld to key %s\r\n", Device_ID,value);
+    LOG_D("Writing Bat %ld to key %d\r\n", value,Device_ID);
 }
 uint8_t Add_Device(uint32_t Device_ID)
 {
-
     uint32_t Num=0;
     Num = Flash_Get_Learn_Nums();
     if(Num>200)return RT_ERROR;

@@ -335,8 +335,8 @@ void DataSolve(Message buf)
                 LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
                 KidLock = buf.Data;
                 KidLockUp(KidLock);
-                RadioEnqueue(1,buf.From_ID,buf.Counter,7,KidLock);
-                KidLockUp(KidLock);
+                //RadioEnqueue(1,buf.From_ID,buf.Counter,7,KidLock);
+                //KidLockUp(KidLock);
             }
         }
         else
@@ -345,12 +345,12 @@ void DataSolve(Message buf)
         }
         break;
     case 8://延迟
-        LOG_D("Delay Close!\r\n");
+        LOG_D("Delay Open!\r\n");
         if(Check_Valid(buf.From_ID))
         {
-            LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
+            //LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
             Delay_Timer_Open();
-            RadioEnqueue(1,buf.From_ID,buf.Counter,8,1);
+            RadioEnqueue(1,buf.From_ID,buf.Counter,8,0);
         }
         else
         {
