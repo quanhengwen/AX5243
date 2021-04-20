@@ -241,10 +241,10 @@ void DataSolve(Message buf)
                 else//是否为来自终端的数据
                 {
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,0);
-                    if(GetDoorID())
-                    {
-                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
-                    }
+//                    if(GetDoorID())
+//                    {
+//                        RadioEnqueue(1,GetDoorID(),buf.Counter,4,0);
+//                    }
                 }
             }
             else if(buf.Data==1)
@@ -259,10 +259,10 @@ void DataSolve(Message buf)
                     RadioEnqueue(0,buf.From_ID,buf.Counter,4,1);
                     if(Now_Status!=SlaverWaterAlarmActive)
                     {
-                        if(GetDoorID())
-                        {
-                            RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
-                        }
+//                        if(GetDoorID())
+//                        {
+//                            RadioEnqueue(1,GetDoorID(),buf.Counter,4,1);
+//                        }
                         Enable_Warining();
                         WariningUpload(buf.From_ID,1,1);
                     }
@@ -350,7 +350,7 @@ void DataSolve(Message buf)
         {
             //LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
             Delay_Timer_Open();
-            RadioEnqueue(1,buf.From_ID,buf.Counter,8,0);
+            //RadioEnqueue(1,buf.From_ID,buf.Counter,8,0);
         }
         else
         {
@@ -367,7 +367,7 @@ void DataSolve(Message buf)
         BackNormalPower();
     }
     Detect_All_TimeInDecoder(buf.From_ID);
-    Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
+    //Check_Wor_Recv(buf.From_ID,buf.Command,buf.Data);
 }
 void Rx_Done_Callback(uint8_t *rx_buffer,uint8_t rx_len,int8_t rssi)
 {

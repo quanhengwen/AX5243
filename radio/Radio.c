@@ -60,7 +60,7 @@ rt_thread_t Radio_Task=RT_NULL;
 #define axradio_phy_preamble_byte 0x55
 
 uint8_t ubReceiveFlag;
-uint8_t ubRssi;;
+int ubRssi;;
 uint8_t axradio_freq_select = 1;
 uint8_t axradio_freq_now = 1;
 uint8_t axradio_power_now = 0;
@@ -998,7 +998,7 @@ void ReceiveData(void)
             case AX5043_FIFOCMD_RSSI:
                 if (ubDataLen != 1)
                     goto dropchunk;
-                ubRssi = SpiReadUnderSingleAddressRegister(REG_AX5043_FIFODATA);
+                ubRssi = SpiReadUnderSingleAddressRegister(REG_AX5043_FIFODATA)+64;
                 LOG_D("Got Rssi is %d\r\n",ubRssi);
                 break;
 

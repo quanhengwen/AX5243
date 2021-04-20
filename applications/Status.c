@@ -111,19 +111,19 @@ void MasterWaterAlarmWarning(void *parameter)
 {
     Moto_Close(NormalOff);
     beep_start(0,2);//红灯,蜂鸣器三下
-    if(GetDoorID())
-    {
-        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,1);
-    }
+//    if(GetDoorID())
+//    {
+//        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,1);
+//    }
     Now_Status = MasterWaterAlarmActive;
     LOG_D("MasterWaterAlarmWarning\r\n");
 }
 void MasterAlarmWaterDisable(void)
 {
-    if(GetDoorID())
-    {
-        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,0);
-    }
+//    if(GetDoorID())
+//    {
+//        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,4,0);
+//    }
 }
 rt_timer_t Delay_Timer = RT_NULL;
 void Delay_Timer_Callback(void *parameter)
@@ -148,32 +148,32 @@ void Delay_Timer_Close(void)
     LOG_D("Delay_Timer is Close\r\n");
     rt_timer_stop(Delay_Timer);
 }
-void KidLock_Enable(void)
-{
-    if(GetDoorID())
-    {
-        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,1);
-        LOG_D("Try to Open KidLock\r\n");
-    }
-    else
-    {
-        LOG_D("No Door Device\r\n");
-    }
-}
-MSH_CMD_EXPORT(KidLock_Enable,KidLock_Enable);
-void KidLock_Disable(void)
-{
-    if(GetDoorID())
-    {
-        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,0);
-        LOG_D("Try to Close KidLock\r\n");
-    }
-    else
-    {
-        LOG_D("No Door Device\r\n");
-    }
-}
-MSH_CMD_EXPORT(KidLock_Disable,KidLock_Disable);
+//void KidLock_Enable(void)
+//{
+//    if(GetDoorID())
+//    {
+//        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,1);
+//        LOG_D("Try to Open KidLock\r\n");
+//    }
+//    else
+//    {
+//        LOG_D("No Door Device\r\n");
+//    }
+//}
+//MSH_CMD_EXPORT(KidLock_Enable,KidLock_Enable);
+//void KidLock_Disable(void)
+//{
+//    if(GetDoorID())
+//    {
+//        RadioEnqueue(1,GetDoorID(),Radio_Counter+1,7,0);
+//        LOG_D("Try to Close KidLock\r\n");
+//    }
+//    else
+//    {
+//        LOG_D("No Door Device\r\n");
+//    }
+//}
+//MSH_CMD_EXPORT(KidLock_Disable,KidLock_Disable);
 void OfflineWarning(void *parameter)
 {
     if(Now_Status!=Offline)

@@ -226,11 +226,6 @@ void Device_Add_WiFi(uint32_t device_id)
     }
     rt_free(Buf);
 }
-void add_test(void)
-{
-    Device_Add_WiFi(10006000);
-}
-MSH_CMD_EXPORT(add_test,add);
 void Device_Delete_WiFi(uint32_t device_id)
 {
     char *Buf = rt_malloc(20);
@@ -239,11 +234,6 @@ void Device_Delete_WiFi(uint32_t device_id)
     local_subdev_del_cmd(Buf);
     rt_free(Buf);
 }
-void del_test(void)
-{
-    Device_Delete_WiFi(20022636);
-}
-MSH_CMD_EXPORT(del_test,del);
 void all_data_update(void)
 {
     //#error "请在此处理可下发可上报数据及只上报数据示例,处理完成后删除该行"
@@ -452,7 +442,7 @@ static unsigned char dp_download_lock_handle(const unsigned char value[], unsign
     lock = mcu_get_dp_download_bool(value,length);
     if(lock == 0) {
         //开关关
-        KidLock_Disable();
+        //KidLock_Disable();
         /*****************************************************************************
         //dp数据处理前需要判断是哪一个子设备id的dp
         //例如用户的网关下面有两个子设备id，一个是"1234"另一个是"5678"
@@ -466,7 +456,7 @@ static unsigned char dp_download_lock_handle(const unsigned char value[], unsign
         *****************************************************************************/
   
     }else {
-        KidLock_Enable();
+        //KidLock_Enable();
         //开关开
     }
   

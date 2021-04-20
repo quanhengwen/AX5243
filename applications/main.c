@@ -46,17 +46,17 @@ int main(void)
         easyflash_init();
         Boot_Times_Record();
         LoadDevice2Memory();
-        WarningInit();
         led_Init();
         Moto_Init();
         button_Init();
-        WaterScan_Init();
-        Key_Reponse();
         Radio_Task_Init();
         //wdt_sample();
         Delay_Timer_Init();
         RTC_Init();
+        WarningInit();
         WiFi_Init();
+        WaterScan_Init();
+        Key_Reponse();
     }
 
     while (1)
