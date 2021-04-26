@@ -245,8 +245,10 @@
 #define  REG_AX5043_PLLVCOI                0x180  //0x1180
 #define  REG_AX5043_XTALCAP                0x184  //0x1184
 #define  REG_AX5043_0xF00                  0xF00  //0x1F00
-#define  REG_AX5043_POWCTRL1                0xF08
+#define  REG_AX5043_POWCTRL1               0xF08
 #define  REG_AX5043_REF                    0xF0D  //0x1F0D
+#define  REG_AX5043_XTALOSC                0xF10 /* Crystal Oscillator Control */
+#define  REG_AX5043_XTALAMPL               0xF11 /* Crystal Oscillator Amplitude Control */
 #define  REG_AX5043_0xF18                  0xF18  //0x1F18
 
 //===================================================

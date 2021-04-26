@@ -55,7 +55,7 @@ int main(void)
         RTC_Init();
         WarningInit();
         WiFi_Init();
-        WaterScan_Init();
+        //WaterScan_Init();
         Key_Reponse();
     }
 

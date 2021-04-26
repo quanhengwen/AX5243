@@ -11,7 +11,6 @@
 #include "rtdevice.h"
 #include "pin_config.h"
 #include "wifi-uart.h"
-#include "ulog.h"
 #include "wifi.h"
 #include "wifi-service.h"
 #include "led.h"

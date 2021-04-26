@@ -148,6 +148,12 @@ void SendWithOldBuff(void)
     WorCheck.SendFlag = 1;
     Wor_send(SendBuf,32);
 }
+void sendtest(void)
+{
+    uint8_t buf[20]={1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1,0,1,2};
+    transmit_packet_task(buf,20);
+}
+MSH_CMD_EXPORT(sendtest,sendtest);
 void RadioEnqueue(uint32_t wor_flag,uint32_t Taget_Id,uint8_t counter,uint8_t Command,uint8_t Data)
 {
     uint8_t NumTemp = Main_Queue.TargetNum;
