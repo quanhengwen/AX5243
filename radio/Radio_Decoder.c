@@ -345,10 +345,11 @@ void DataSolve(Message buf)
         }
         break;
     case 8://延迟
-        LOG_D("Delay Open!\r\n");
         if(Check_Valid(buf.From_ID))
         {
-            //LOG_D("RECV KidLock %d From Door\r\n",buf.Data);
+            LOG_I("Delay Open %d From %ld\r\n",buf.Data,buf.From_ID);
+            RadioEnqueue(0,buf.From_ID,buf.Counter,8,buf.Data);
+            Delay_Close_WiFi(buf.From_ID);
             Delay_Timer_Open();
             //RadioEnqueue(1,buf.From_ID,buf.Counter,8,0);
         }

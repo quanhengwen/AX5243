@@ -19,3 +19,6 @@ void RemoteOpenUpload(uint32_t device_id,uint8_t state);
 void Slave_Heart(uint32_t device_id,uint8_t rssi,uint8_t bat);
 void Device_Add_WiFi(uint32_t device_id);
 void Device_Delete_WiFi(uint32_t device_id);
+void Delay_Close_WiFi(uint32_t device_id);
+void Warning_WiFi(void);
+void Warning_Clear_WiFi(void);

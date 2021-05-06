@@ -25,7 +25,6 @@
 ******************************************************************************/
 
 #include "wifi.h"
-#include "ulog.h"
 #include "moto.h"
 #include "status.h"
 #include "flashwork.h"
@@ -182,9 +181,9 @@ void Slave_Heart(uint32_t device_id,uint8_t rssi,uint8_t bat)
     char *Buf = rt_malloc(20);
     sprintf(Buf,"%ld",device_id);
     LOG_D("Slave_Heart Device ID is %ld,rssi is %d,bat is %d\r\n",device_id,rssi,bat);
-    mcu_dp_enum_update(101,rssi,Buf,my_strlen(Buf)); //BOOL型数据上报;
-    mcu_dp_value_update(102,bat,Buf,my_strlen(Buf)); //BOOL型数据上报;
-    heart_beat_report(Buf,1);
+    mcu_dp_value_update(101,rssi,Buf,my_strlen(Buf)); //VALUE型数据上报;
+    mcu_dp_value_update(102,bat,Buf,my_strlen(Buf)); //VALUE型数据上报;
+//    heart_beat_report(Buf,1);
 }
 void MotoUpload(uint8_t state)
 {
@@ -215,14 +214,16 @@ void Device_Add_WiFi(uint32_t device_id)
 {
     char *Buf = rt_malloc(20);
     sprintf(Buf,"%ld",device_id);
-    LOG_D("Device_Add_by WiFi ID is %d\r\n",device_id);
+    local_add_subdev_limit(1,0,0x3C);
     if(GetDoorID()==device_id)
     {
         gateway_subdevice_add("1.0",door_pid,0,Buf,10,0);
+        LOG_I("Door_Add_by WiFi ID is %d\r\n",device_id);
     }
     else
     {
         gateway_subdevice_add("1.0",slave_pid,0,Buf,10,0);
+        LOG_I("Slave_Add_by WiFi ID is %d\r\n",device_id);
     }
     rt_free(Buf);
 }
@@ -233,6 +234,24 @@ void Device_Delete_WiFi(uint32_t device_id)
     LOG_D("Device_Del_by WiFi ID is %d\r\n",device_id);
     local_subdev_del_cmd(Buf);
     rt_free(Buf);
+}
+void Delay_Close_WiFi(uint32_t device_id)
+{
+    char *Buf = rt_malloc(20);
+    LOG_D("Delay_Close_WiFi is upload\r\n");
+    sprintf(Buf,"%ld",device_id);
+    mcu_dp_bool_update(DPID_DELAY_STATE,1,Buf,my_strlen(Buf)); //VALUE型数据上报;
+    rt_free(Buf);
+}
+void Warning_Clear_WiFi(void)
+{
+    LOG_D("Warning_Clear_WiFi is upload\r\n");
+    mcu_dp_bool_update(DPID_NORMAL,1,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
+}
+void Warning_WiFi(void)
+{
+    LOG_D("Warning_WiFi is upload\r\n");
+    mcu_dp_bool_update(DPID_NORMAL,0,STR_GATEWAY_ITSELF_ID,my_strlen(STR_GATEWAY_ITSELF_ID)); //VALUE型数据上报;
 }
 void all_data_update(void)
 {
@@ -709,7 +728,7 @@ void heart_beat_check(unsigned char* data_buf,unsigned short data_len)
     /////////////////////////请在此处根据获取到的sub_id进行子设备心跳的回复////////////////////////
     //////////////////在线的设备需要回复心跳，连续2  个心跳周期不回复则认为该设备离线////////////////
     //这边只给出示例，具体用法请在mcu_api.c里面的heart_beat_report查看函数说明
-    //heart_beat_report(sub_id, lowpower_flag);
+    heart_beat_report(sub_id, 0);
 
     cJSON_Delete(root);
     return;
@@ -1384,7 +1403,7 @@ void local_del_subdev(unsigned char result)
  */
 void local_subdev_limit(unsigned char result)
 {
-    #error "请自行实现本地允许/关闭添加子设备结果通知代码,完成后请删除该行"
+    //#error "请自行实现本地允许/关闭添加子设备结果通知代码,完成后请删除该行"
     if(result == 0) {
         //本地允许/关闭添加子设备成功
     }else {

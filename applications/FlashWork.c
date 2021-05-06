@@ -187,9 +187,9 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
         Num = Flash_Get_Learn_Nums();
         Global_Device.ID[Num] = Device_ID;
         Flash_Key_Change(Num,Device_ID);
-        Device_Add_WiFi(Device_ID);
         Global_Device.DoorID = Num;
         Flash_Key_Change(88888888,Num);
+        Device_Add_WiFi(Device_ID);
         LOG_D("Replace Learn\r\n");
         return RT_EOK;
     }
@@ -202,9 +202,9 @@ uint8_t Add_DoorDevice(uint32_t Device_ID)
         Global_Device.Num = Num;
         Global_Device.ID[Num] = Device_ID;
         Flash_Key_Change(Num,Device_ID);
-        Device_Add_WiFi(Device_ID);
         Global_Device.DoorID = Num;
         Flash_Key_Change(88888888,Num);
+        Device_Add_WiFi(Device_ID);
         LOG_D("New Learn\r\n");
         return RT_EOK;
     }

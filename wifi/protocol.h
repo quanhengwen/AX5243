@@ -194,7 +194,7 @@ local_del_subdev内部有#err提示,完成函数后请删除该#err
 并在protocol.c文件local_subdev_limit函数内查看结果,
 local_subdev_limit内部有#err提示,完成函数后请删除该#err
 ******************************************************************************/
-//#define         LOCAL_ADD_SUBDEV_LIMIT_ENABLE          //开启本地允许/关闭添加子设备
+#define         LOCAL_ADD_SUBDEV_LIMIT_ENABLE          //开启本地允许/关闭添加子设备
 
 /******************************************************************************
                       MCU是否需要支持获取模块内存
@@ -368,7 +368,7 @@ mcu在wifi模块正确联网后可调用 get_green_time_with_zone() 函数发起
 #define DPID_CONTROL_STATE 104
 //延时开关开关阀(可下发可上报)
 //备注:开阀方式3：延时开关执行开关阀
-#define DPID_DELAY_STATE 106
+#define DPID_DELAY_STATE 105
 //童锁开关(可下发可上报)
 //备注:
 #define DPID_LOCK 108
@@ -381,6 +381,8 @@ mcu在wifi模块正确联网后可调用 get_green_time_with_zone() 函数发起
 //2：倒计时3h
 //3：倒计时4h
 #define DPID_DELAY_TIME 110
+
+#define DPID_NORMAL 111
 
 
 

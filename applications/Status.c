@@ -18,6 +18,7 @@
 #include "work.h"
 #include "string.h"
 #include "rthw.h"
+#include "wifi-service.h"
 
 #define DBG_TAG "status"
 #define DBG_LVL DBG_LOG
@@ -26,8 +27,6 @@
 extern enum Device_Status Now_Status;
 extern uint8_t ValveStatus;
 extern uint16_t Radio_Counter;
-
-
 
 WariningEvent NowStatusEvent;
 WariningEvent SlaverLowPowerEvent;
@@ -74,6 +73,7 @@ void Warning_Enable_Num(uint8_t id)
     case 5:Warning_Enable(OfflineEvent);break;
     case 6:Warning_Enable(MotoFailEvent);break;
     }
+    Warning_WiFi();
 }
 void Warning_Disable(void)
 {
@@ -226,6 +226,7 @@ uint8_t Detect_Learn(void)
 }
 void BackToNormal(void)
 {
+    Warning_Clear_WiFi();
     WaterScan_Clear();
     beep_stop();
     led_Stop(0);
@@ -237,6 +238,5 @@ void BackToNormal(void)
     {
         Now_Status = Close;
     }
-
 }
 
